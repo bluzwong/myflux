@@ -8,8 +8,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.github.bluzwong.flux.processor.annotation.Maintain;
 
 public class MainActivity extends AppCompatActivity {
+
+    @Maintain
+    String ccf = "wsd";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
