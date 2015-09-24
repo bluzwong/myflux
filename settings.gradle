@@ -1,1 +1,1 @@
-include ':app', ':myflux-lib' , ':flux-processor'
+include ':app', ':myflux-lib' , ':myflux-processor'

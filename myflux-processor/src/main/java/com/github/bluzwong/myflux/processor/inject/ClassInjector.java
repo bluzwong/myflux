@@ -1,4 +1,4 @@
-package com.github.bluzwong.flux.processor.inject;
+package com.github.bluzwong.myflux.processor.inject;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

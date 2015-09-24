@@ -1,4 +1,4 @@
-package com.github.bluzwong.flux.processor.annotation;
+package com.github.bluzwong.myflux.processor.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

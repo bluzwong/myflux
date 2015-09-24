@@ -1,4 +1,4 @@
-package com.github.bluzwong.flux.processor.inject;
+package com.github.bluzwong.myflux.processor.inject;
 
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/24.

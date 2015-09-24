@@ -1,4 +1,4 @@
-package com.github.bluzwang.myflux_kotlin;
+package com.github.bluzwang.myflux.example;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,7 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.github.bluzwong.flux.processor.annotation.Maintain;
+import com.github.bluzwang.myflux_kotlin.R;
+import com.github.bluzwong.myflux.processor.annotation.Maintain;
 
 public class MainActivity extends AppCompatActivity {
 

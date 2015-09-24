@@ -1,4 +1,4 @@
-package com.github.bluzwong.flux.processor.annotation;
+package com.github.bluzwong.myflux.processor.annotation;
 
 
 
@@ -10,16 +10,12 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
-import java.io.Writer;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/24.
  */
-@SupportedAnnotationTypes({"com.github.bluzwong.flux.processor.annotation.Maintain"})
+@SupportedAnnotationTypes({"com.github.bluzwong.myflux.processor.annotation.Maintain"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class AnnotationProcessor extends AbstractProcessor{
     private static final String SUFFIX = "$$Maintain";
@@ -51,7 +47,7 @@ public class AnnotationProcessor extends AbstractProcessor{
             log("size " + annotations.size());
             for (Element e : roundEnv.getElementsAnnotatedWith(te)) {
                 //log("work on -> " + e.toString());
-                Name name = elementUtils.getPackageOf(e).getQualifiedName();
+                Name name = e.getSimpleName();
                 log("name -> " + name); //
                 Element enclosingElement = e.getEnclosingElement();
                 log("element -> " +enclosingElement); //
