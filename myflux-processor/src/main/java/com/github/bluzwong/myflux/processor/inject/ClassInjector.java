@@ -10,11 +10,14 @@ public class ClassInjector {
 
     private final String classPackage;
     private final String className;
+    private final String originClassName;
     private final Set<FieldInjector> fields;
+    private static final String SUFFIX = "$$Maintain";
 
     public ClassInjector(String classPackage, String className) {
         this.classPackage = classPackage;
-        this.className = className;
+        this.originClassName = className;
+        this.className = className + SUFFIX;
         this.fields = new LinkedHashSet<>();
     }
 
@@ -28,16 +31,45 @@ public class ClassInjector {
 
     public String brewJava() throws Exception {
         StringBuilder builder = new StringBuilder("package " + this.classPackage + ";\n");
-        builder.append("public class " + this.className + " {\n");
-        /*builder.append("import org.gemini.httpengine.library.*;\n");
+        builder.append("import com.github.bluzwong.myflux.lib.*;\n");
+        builder.append("import java.util.ArrayList;\n");
+        builder.append("import java.util.List;\n");
 
-        String action = this.isInterface ? "implements" : "extends";
+        builder.append("public class ").append(this.className).append(" {\n");
 
-        builder.append("public class " + this.className + " " + action + " " + this.targetClass + " {\n");*/
+        builder.append("public static void autoSave(Object obj, SavedData savingData) {\n"); // start of method
+        builder.append("if (obj == null || savingData == null) {\n");
+        builder.append("return;\n}\n");
+        builder.append("List<String> savedNames = new ArrayList<String>();\n");
+        builder.append(originClassName).append(" target = (").append(originClassName).append(") obj;\n");
         for (FieldInjector methodInjector : fields) {
-        //    builder.append(methodInjector.brewJava());
+            builder.append(methodInjector.brewJava());
         }
-        builder.append("}\n");
+        builder.append("if (savedNames.size() > 0) {\n");
+        builder.append("savingData.put(\"savingInfos\", savedNames);}\n");
+        builder.append("}\n"); // end of method
+
+        builder.append("public static void autoRestore(Object obj, SavedData savedData)  {\n"); // start of method
+        builder.append("if (obj == null || savedData == null) {\n");
+        builder.append("return;\n}\n");
+        builder.append("Object savedNamesTmp = savedData.get(\"savingInfos\");\n" +
+                "        if (savedNamesTmp == null || !(savedNamesTmp instanceof List)) {\n" +
+                "            return;\n" +
+                "        }\n");
+
+        builder.append("List<String> savedNames = (List<String>) savedNamesTmp;\n");
+        builder.append("for (String name : savedNames) {\n" +
+                "            Object tmp = savedData.get(name);\n" +
+                "            if (tmp == null) {\n" +
+                "                continue;\n" +
+                "            }\n");
+        builder.append(originClassName).append(" target = (").append(originClassName).append(") obj;\n");
+        for (FieldInjector methodInjector : fields) {
+            builder.append(methodInjector.brewJavaRestore());
+        }
+        builder.append("}\n"); // end of for1
+        builder.append("}\n"); // end of method
+        builder.append("}\n"); // end of class
         return builder.toString();
     }
 }

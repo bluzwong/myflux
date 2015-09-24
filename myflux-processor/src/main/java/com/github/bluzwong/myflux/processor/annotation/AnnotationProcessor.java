@@ -2,14 +2,19 @@ package com.github.bluzwong.myflux.processor.annotation;
 
 
 
+import com.github.bluzwong.myflux.processor.inject.ClassInjector;
+import com.github.bluzwong.myflux.processor.inject.FieldInjector;
+
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+import java.io.Writer;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,7 +23,7 @@ import java.util.Set;
 @SupportedAnnotationTypes({"com.github.bluzwong.myflux.processor.annotation.Maintain"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class AnnotationProcessor extends AbstractProcessor{
-    private static final String SUFFIX = "$$Maintain";
+
 
     private Filer filer;
     private Elements elementUtils;
@@ -41,8 +46,8 @@ public class AnnotationProcessor extends AbstractProcessor{
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         log("start process ");
-        //Map<TypeElement, ClassInjector> targetClassMap = findAndParseTargets(annotations, roundEnv);
-        for (TypeElement te : annotations) {
+        Map<TypeElement, ClassInjector> targetClassMap = findAndParseTargets(annotations, roundEnv);
+        /*for (TypeElement te : annotations) {
             // te = zhujie
             log("size " + annotations.size());
             for (Element e : roundEnv.getElementsAnnotatedWith(te)) {
@@ -55,13 +60,13 @@ public class AnnotationProcessor extends AbstractProcessor{
 //                log("simplename" + e.getSimpleName());
             }
         }
-
-       /* for (Map.Entry<TypeElement, ClassInjector> entry : targetClassMap.entrySet()) {
+*/
+        for (Map.Entry<TypeElement, ClassInjector> entry : targetClassMap.entrySet()) {
             TypeElement typeElement = entry.getKey();
             ClassInjector injector = entry.getValue();
             try {
                 String value = injector.brewJava();
-
+                log(value);
                 JavaFileObject jfo = filer.createSourceFile(injector.getFqcn(), typeElement);
                 Writer writer = jfo.openWriter();
                 writer.write(value);
@@ -70,12 +75,12 @@ public class AnnotationProcessor extends AbstractProcessor{
             } catch (Exception e) {
                 processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage(), typeElement);
             }
-        }*/
+        }
 
         return true;
     }
 
-    /*private Map<TypeElement, ClassInjector> findAndParseTargets(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    private Map<TypeElement, ClassInjector> findAndParseTargets(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Map<TypeElement, ClassInjector> targetClassMap = new LinkedHashMap<>();
 
         for (TypeElement te : annotations) {
@@ -97,7 +102,6 @@ public class AnnotationProcessor extends AbstractProcessor{
         }
         return targetClassMap;
     }
-*/
     /**
      *
      *
@@ -106,17 +110,16 @@ public class AnnotationProcessor extends AbstractProcessor{
      * @return
      */
 
-   /* private ClassInjector getOrCreateTargetClass(Map<TypeElement, ClassInjector> targetClassMap, TypeElement enclosingElement) {
+    private ClassInjector getOrCreateTargetClass(Map<TypeElement, ClassInjector> targetClassMap, TypeElement enclosingElement) {
         ClassInjector injector = targetClassMap.get(enclosingElement);
         if (injector == null) {
             String classPackage = getPackageName(enclosingElement);
-            String className = getClassName(enclosingElement, classPackage) + SUFFIX;
+            String className = getClassName(enclosingElement, classPackage);
             injector = new ClassInjector(classPackage, className);
             targetClassMap.put(enclosingElement, injector);
         }
         return injector;
     }
-*/
 
     /**
      *

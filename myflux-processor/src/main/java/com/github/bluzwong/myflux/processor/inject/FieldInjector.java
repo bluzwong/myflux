@@ -12,7 +12,14 @@ public class FieldInjector {
 
     public String brewJava() throws Exception{
         StringBuilder builder = new StringBuilder();
-        builder.append("\nsavingData.put(").append(fieldName).append(", value);");
+        builder.append("savingData.put(\"").append(fieldName).append("\", target.").append(fieldName).append(");\n");
+        builder.append("savedNames.add(\"").append(fieldName).append("\");\n");
+        return builder.toString();
+    }
+
+    public String brewJavaRestore()  {
+        StringBuilder builder = new StringBuilder();
+        builder.append("target." + fieldName).append("=tmp;\n");
         return builder.toString();
     }
 }
