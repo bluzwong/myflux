@@ -1,4 +1,4 @@
-package com.github.bluzwong.myflux.lib
+package com.github.bluzwong.myflux.lib.kotlin
 
 import org.simple.eventbus.EventBus
 import java.util.*
@@ -6,8 +6,8 @@ import java.util.*
 /**
  * Created by Bruce on 15/9/3.
  */
-public class Dispatcher(val eventBus: EventBus) {
-    private val registeredObj:MutableList<Any> = ArrayList<Any>()
+public class Dispatcher(val eventBus: org.simple.eventbus.EventBus) {
+    private val registeredObj:MutableList<Any> = java.util.ArrayList<Any>()
     public fun register(obj: Any): Unit {
         if (!registeredObj.contains(obj)) {
             registeredObj.add(obj)
@@ -28,7 +28,7 @@ public class Dispatcher(val eventBus: EventBus) {
     public fun postResponseToUIWithType(type: String): ResponseBuilder = ResponseBuilder(type)
 
     public open inner class Builder(val type: String, val postObj: (String,Int, MutableMap<String, Any>) -> Any) {
-        val data: MutableMap<String, Any> = HashMap()
+        val data: MutableMap<String, Any> = java.util.HashMap()
         var tmpKey: String? = null
         var owner = -1
         public open fun key(key: String): Builder {

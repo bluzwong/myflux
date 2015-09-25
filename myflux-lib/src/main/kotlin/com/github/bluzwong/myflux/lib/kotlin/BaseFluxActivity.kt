@@ -1,11 +1,11 @@
-package com.github.bluzwong.myflux.lib
+package com.github.bluzwong.myflux.lib.kotlin
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/15.
  */
-public abstract class BaseFluxActivity : AppCompatActivity(), FluxResponse {
+public abstract class BaseFluxActivity : android.support.v7.app.AppCompatActivity(), FluxResponse {
 
     /**
      * provide layout resource id
@@ -33,7 +33,7 @@ public abstract class BaseFluxActivity : AppCompatActivity(), FluxResponse {
      */
     protected abstract fun onNewView():Unit
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: android.os.Bundle?) {
         super<AppCompatActivity>.onCreate(savedInstanceState)
         setContentView(provideContentId())
         init()
@@ -44,7 +44,7 @@ public abstract class BaseFluxActivity : AppCompatActivity(), FluxResponse {
         }
     }
 
-    override public fun onSaveInstanceState(outState: Bundle?) {
+    override public fun onSaveInstanceState(outState: android.os.Bundle?) {
         super<AppCompatActivity>.onSaveInstanceState(outState)
         provideStore()?.onSaveInstanceState(outState ?: return)
     }

@@ -1,4 +1,4 @@
-package com.github.bluzwong.myflux.lib
+package com.github.bluzwong.myflux.lib.kotlin
 
 import java.util.*
 

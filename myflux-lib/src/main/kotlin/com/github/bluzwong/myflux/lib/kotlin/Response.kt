@@ -1,4 +1,4 @@
-package com.github.bluzwong.myflux.lib
+package com.github.bluzwong.myflux.lib.kotlin
 
 /**
  * Created by Bruce on 15/9/3.
