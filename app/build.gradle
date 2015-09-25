@@ -23,13 +23,18 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-
+repositories {
+    maven {
+        url 'https://dl.bintray.com/bluzwong/maven'
+    }
+}
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'org.simple:androideventbus:latest'
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:design:22.2.1'
+//    compile 'com.github.bluzwong:myflux-lib:0.9.0@aar'
     compile project(':myflux-lib')
-    compile project(':myflux-processor')
+    apt project(':myflux-processor')
 
 }

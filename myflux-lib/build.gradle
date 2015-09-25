@@ -20,6 +20,9 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
 }
 
 dependencies {
@@ -42,3 +45,4 @@ buildscript {
 repositories {
     mavenCentral()
 }
+apply from: '../push.gradle'

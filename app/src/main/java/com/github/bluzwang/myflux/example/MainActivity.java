@@ -1,19 +1,10 @@
 package com.github.bluzwang.myflux.example;
 
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import com.github.bluzwang.myflux_kotlin.R;
 
 import com.github.bluzwong.myflux.lib.BaseFluxActivity;
 import com.github.bluzwong.myflux.lib.FluxStore;
-import com.github.bluzwong.myflux.processor.annotation.Maintain;
 
 import java.util.Map;
 

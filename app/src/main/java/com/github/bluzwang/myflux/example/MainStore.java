@@ -5,7 +5,7 @@ import android.util.Log;
 import com.github.bluzwong.myflux.lib.FluxDispatcher;
 import com.github.bluzwong.myflux.lib.FluxStore;
 import com.github.bluzwong.myflux.lib.SavedData;
-import com.github.bluzwong.myflux.processor.annotation.Maintain;
+import com.github.bluzwong.myflux.lib.Maintain;
 
 import java.util.Map;
 

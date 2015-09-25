@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/24.
  */
-@SupportedAnnotationTypes({"com.github.bluzwong.myflux.processor.annotation.Maintain"})
+@SupportedAnnotationTypes({"com.github.bluzwong.myflux.lib.Maintain"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class AnnotationProcessor extends AbstractProcessor{
 
