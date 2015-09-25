@@ -1,7 +1,10 @@
 package com.github.bluzwong.myflux.lib;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import org.jetbrains.annotations.NotNull;
 import org.simple.eventbus.Subscriber;
 
 import java.util.Map;
@@ -9,12 +12,8 @@ import java.util.Map;
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/25.
  */
-public abstract class BaseFluxActivity extends AppCompatActivity {
-    protected abstract int provideContentId();
-
+public abstract class BaseFluxFragment extends Fragment {
     protected abstract FluxStore provideStore();
-
-    protected abstract void init();
 
     protected abstract void onRestoreView();
 
@@ -23,11 +22,10 @@ public abstract class BaseFluxActivity extends AppCompatActivity {
     protected abstract void onResponse(String type, Map<String, Object> dataMap);
 
     private int hashCode = hashCode();
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(provideContentId());
-        init();
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         FluxStore store = provideStore();
         if (store == null || !store.register(this, savedInstanceState, new Runnable() {
             @Override
@@ -39,6 +37,7 @@ public abstract class BaseFluxActivity extends AppCompatActivity {
         }
     }
 
+
     @Subscriber
     public void onReceiveResponse(FluxResponse response) {
         if (response.getOwner() != hashCode) {
@@ -48,7 +47,7 @@ public abstract class BaseFluxActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if (provideStore() != null) {
             provideStore().onSaveInstanceState(outState);
@@ -56,7 +55,7 @@ public abstract class BaseFluxActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroyView() {
         if (provideStore() != null) {
             provideStore().unregister(this);
         }
@@ -64,7 +63,7 @@ public abstract class BaseFluxActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (provideStore() != null) {
             provideStore().onResume();

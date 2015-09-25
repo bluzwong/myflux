@@ -45,10 +45,26 @@ public enum FluxDispatcher {
         eventBus.post(event);
     }
 
+    /**
+     * when your action creator have received data from data source(database or webapi)
+     * use this method to dispatch to its store
+     * called only in action creator
+     * @param type
+     * @param owner
+     * @return
+     */
     public ActionBuilder dispatchRequestToStoreWithType(String type, int owner) {
         return new ActionBuilder(type, owner);
     }
 
+    /**
+     * when store handled data (hold them and easy logic) from creator(by this dispatcher)
+     * tell ui to show them
+     * called only in store
+     * @param type
+     * @param owner
+     * @return
+     */
     public ResponseBuilder postResponseToUIWithType(String type, int owner) {
         return new ResponseBuilder(type, owner);
     }
