@@ -10,6 +10,9 @@ private var stickyCount = 0
  */
 public abstract class Store(val dispatcher: Dispatcher) {
 
+
+    val maintain = MaintainFactory.create(this)
+
     var owner = -1 // ����store��Ӧ�� view hash
     var savedOwner = -1 // �ָ�״̬ʱ��õ�view hash
     var restoreViewFunc:(() -> Unit)? = null
@@ -32,6 +35,7 @@ public abstract class Store(val dispatcher: Dispatcher) {
         if (--stickyCount == 0) {
             dispatcher.eventBus.removeStickyEvent(savedData.javaClass)
         }
+        maintain.autoRestore(this, savedData)
 //        RemainUtils.autoRestore(this, savedData)
         onDataRestored(savedData)
         restoreViewFunc?.invoke()
@@ -43,6 +47,7 @@ public abstract class Store(val dispatcher: Dispatcher) {
         outState.putInt("ownerHashCode", owner)
         val savedData = SavedData(owner)
         onPreSavingData(savedData)
+        maintain.autoSave(this, savedData)
 //        RemainUtils.autoSave(this, savedData)
         //dispatcher.unregister(this)
         dispatcher.eventBus.postSticky(savedData)

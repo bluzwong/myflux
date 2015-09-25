@@ -13,7 +13,7 @@ public abstract class BaseFluxFragment:Fragment(), FluxResponse {
     protected abstract fun onNewView()
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        super<Fragment>.onViewCreated(view, savedInstanceState)
         if (provideStore()?.register(this, savedInstanceState, { onRestoreView() }) ?: false) {
 
         } else {
@@ -22,17 +22,17 @@ public abstract class BaseFluxFragment:Fragment(), FluxResponse {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
+        super<Fragment>.onSaveInstanceState(outState)
         provideStore()?.onSaveInstanceState(outState)
     }
 
     override fun onResume() {
-        super.onResume()
+        super<Fragment>.onResume()
         provideStore()?.onResume()
     }
 
     override fun onDestroyView() {
         provideStore()?.unregister(this)
-        super.onDestroyView()
+        super<Fragment>.onDestroyView()
     }
 }

@@ -1,6 +1,8 @@
 package com.github.bluzwong.myflux.processor.inject;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,7 +20,7 @@ public class ClassInjector {
         this.classPackage = classPackage;
         this.originClassName = className;
         this.className = className + SUFFIX;
-        this.fields = new LinkedHashSet<>();
+        this.fields = new LinkedHashSet<FieldInjector>();
     }
 
     public void addField(FieldInjector e) {
@@ -29,15 +31,20 @@ public class ClassInjector {
         return classPackage + "." + className;
     }
 
+    public static void main(String[] args) {
+        String ccf = "";
+        Map<String, String> nameTypes = new HashMap<String, String>();
+
+    }
     public String brewJava() throws Exception {
         StringBuilder builder = new StringBuilder("package " + this.classPackage + ";\n");
         builder.append("import com.github.bluzwong.myflux.lib.*;\n");
         builder.append("import java.util.ArrayList;\n");
         builder.append("import java.util.List;\n");
 
-        builder.append("public class ").append(this.className).append(" {\n");
+        builder.append("public class ").append(this.className).append(" implements IMaintain {\n");
 
-        builder.append("public static void autoSave(Object obj, SavedData savingData) {\n"); // start of method
+        builder.append("@Override public  void autoSave(Object obj, SavedData savingData) {\n"); // start of method
         builder.append("if (obj == null || savingData == null) {\n");
         builder.append("return;\n}\n");
         builder.append("List<String> savedNames = new ArrayList<String>();\n");
@@ -49,13 +56,15 @@ public class ClassInjector {
         builder.append("savingData.put(\"savingInfos\", savedNames);}\n");
         builder.append("}\n"); // end of method
 
-        builder.append("public static void autoRestore(Object obj, SavedData savedData)  {\n"); // start of method
+        // method restore
+        builder.append("@Override public  void autoRestore(Object obj, SavedData savedData)  {\n"); // start of method
         builder.append("if (obj == null || savedData == null) {\n");
         builder.append("return;\n}\n");
         builder.append("Object savedNamesTmp = savedData.get(\"savingInfos\");\n" +
                 "        if (savedNamesTmp == null || !(savedNamesTmp instanceof List)) {\n" +
                 "            return;\n" +
                 "        }\n");
+
 
         builder.append("List<String> savedNames = (List<String>) savedNamesTmp;\n");
         builder.append("for (String name : savedNames) {\n" +

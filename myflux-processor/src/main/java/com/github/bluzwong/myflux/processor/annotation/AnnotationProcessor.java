@@ -8,6 +8,7 @@ import com.github.bluzwong.myflux.processor.inject.FieldInjector;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
@@ -81,21 +82,20 @@ public class AnnotationProcessor extends AbstractProcessor{
     }
 
     private Map<TypeElement, ClassInjector> findAndParseTargets(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        Map<TypeElement, ClassInjector> targetClassMap = new LinkedHashMap<>();
+        Map<TypeElement, ClassInjector> targetClassMap = new LinkedHashMap<TypeElement, ClassInjector>();
 
         for (TypeElement te : annotations) {
             // te = zhujie
-            log("size " + annotations.size());
             for (Element e : roundEnv.getElementsAnnotatedWith(te)) {
                 //log("work on -> " + e.toString());
                 Name fieldName = e.getSimpleName();
                 log("fieldName -> " + fieldName); //
                 TypeElement className = (TypeElement) e.getEnclosingElement();
-                log("element -> " + className); //
-
+                log("fieldInClass -> " + className); //
+                log("fieldType -> " + e.asType().toString());
 //                log("simplename" + e.getSimpleName());
                 ClassInjector injector = getOrCreateTargetClass(targetClassMap, className);
-                FieldInjector methodInjector = new FieldInjector(fieldName.toString());
+                FieldInjector methodInjector = new FieldInjector(fieldName.toString(), e.asType().toString());
                 injector.addField(methodInjector);
             }
 

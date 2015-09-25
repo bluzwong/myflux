@@ -1,13 +1,17 @@
 package com.github.bluzwong.myflux.processor.inject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/24.
  */
 public class FieldInjector {
     private String fieldName;
-
-    public FieldInjector(String fieldName) {
+    private String type;
+    public FieldInjector(String fieldName, String type) {
         this.fieldName = fieldName;
+        this.type = type;
     }
 
     public String brewJava() throws Exception{
@@ -19,7 +23,18 @@ public class FieldInjector {
 
     public String brewJavaRestore()  {
         StringBuilder builder = new StringBuilder();
-        builder.append("target." + fieldName).append("=tmp;\n");
+        builder.append("target." + fieldName).append("= ( " + type +")tmp;\n");
         return builder.toString();
+    }
+    public static void main(String[] args) {
+        Map<String, String> nameTypes = new HashMap<String, String>();
+        String s = "aaaa";
+        Object o = s;
+        String fieldName = "";
+        Class clz = o.getClass();
+
+       // String aaa = clz.cast(o);
+        //System.out.println(aaa);
+        nameTypes.put(fieldName, s.getClass().getCanonicalName());
     }
 }
