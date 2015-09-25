@@ -47,36 +47,23 @@ public class ClassInjector {
         builder.append("@Override public  void autoSave(Object obj, SavedData savingData) {\n"); // start of method
         builder.append("if (obj == null || savingData == null) {\n");
         builder.append("return;\n}\n");
-        builder.append("List<String> savedNames = new ArrayList<String>();\n");
         builder.append(originClassName).append(" target = (").append(originClassName).append(") obj;\n");
         for (FieldInjector methodInjector : fields) {
             builder.append(methodInjector.brewJava());
         }
-        builder.append("if (savedNames.size() > 0) {\n");
-        builder.append("savingData.put(\"savingInfos\", savedNames);}\n");
+
         builder.append("}\n"); // end of method
 
         // method restore
         builder.append("@Override public  void autoRestore(Object obj, SavedData savedData)  {\n"); // start of method
         builder.append("if (obj == null || savedData == null) {\n");
         builder.append("return;\n}\n");
-        builder.append("Object savedNamesTmp = savedData.get(\"savingInfos\");\n" +
-                "        if (savedNamesTmp == null || !(savedNamesTmp instanceof List)) {\n" +
-                "            return;\n" +
-                "        }\n");
 
-
-        builder.append("List<String> savedNames = (List<String>) savedNamesTmp;\n");
-        builder.append("for (String name : savedNames) {\n" +
-                "            Object tmp = savedData.get(name);\n" +
-                "            if (tmp == null) {\n" +
-                "                continue;\n" +
-                "            }\n");
         builder.append(originClassName).append(" target = (").append(originClassName).append(") obj;\n");
+        builder.append("Object tmp;\n");
         for (FieldInjector methodInjector : fields) {
             builder.append(methodInjector.brewJavaRestore());
         }
-        builder.append("}\n"); // end of for1
         builder.append("}\n"); // end of method
         builder.append("}\n"); // end of class
         return builder.toString();

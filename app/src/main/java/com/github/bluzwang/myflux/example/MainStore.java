@@ -15,6 +15,8 @@ import java.util.Map;
 public class MainStore extends FluxStore {
     @Maintain
     String wsd;
+    @Maintain
+    int ccf;
     public MainStore(FluxDispatcher dispatcher) {
         super(dispatcher);
     }
@@ -26,6 +28,6 @@ public class MainStore extends FluxStore {
 
     @Override
     protected void onDataRestored(SavedData savedData) {
-        Log.i("bruce", "date restrored " + wsd);
+        Log.i("bruce", "date restrored -------------------> \nwsd = " + wsd + " \nccf = "  + ccf);
     }
 }
