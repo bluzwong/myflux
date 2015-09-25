@@ -33,7 +33,7 @@ public class MainActivity extends BaseFluxActivity {
 
     @Override
     protected void onNewView() {
-        store.wsd = "hehe";
+        store.fuckingCcf = "hehe";
         store.ccf = 250;
         Log.i("bruce", "new view =========================");
     }

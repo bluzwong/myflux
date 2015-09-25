@@ -33,8 +33,10 @@ dependencies {
     compile 'org.simple:androideventbus:latest'
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:design:22.2.1'
-//    compile 'com.github.bluzwong:myflux-lib:0.9.0@aar'
-    compile project(':myflux-lib')
-    apt project(':myflux-processor')
+
+    compile 'com.github.bluzwong:myflux-lib:0.9.1@aar'
+    provided 'com.github.bluzwong:myflux-processor:0.9.4'
+//    compile project(':myflux-lib')
+//    apt project(':myflux-processor')
 
 }
