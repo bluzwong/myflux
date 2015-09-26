@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import org.jetbrains.annotations.NotNull;
 import org.simple.eventbus.Subscriber;
 
 import java.util.Map;
@@ -47,7 +46,7 @@ public abstract class BaseFluxFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(@NotNull Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (provideStore() != null) {
             provideStore().onSaveInstanceState(outState);
