@@ -122,7 +122,7 @@ public enum FluxDispatcher {
             return this;
         }
         public void post() {
-            postToBus(new FluxAction(type, owner, data));
+            postToBus(new FluxResponse(type, owner, data));
         }
     }
 
