@@ -18,6 +18,8 @@ public class MainStore extends FluxStore {
     @Maintain
     int ccf;
 
+    @Maintain
+    double wsd;
     public MainStore(FluxDispatcher dispatcher) {
         super(dispatcher);
     }
