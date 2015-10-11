@@ -24,9 +24,9 @@ android {
     }
 }
 repositories {
-    maven {
-        url 'https://dl.bintray.com/bluzwong/maven'
-    }
+//    maven {
+//        url 'https://dl.bintray.com/bluzwong/maven'
+//    }
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -34,9 +34,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:design:22.2.1'
 
-//    compile 'com.github.bluzwong:myflux-lib:0.9.3@aar'
-//    provided 'com.github.bluzwong:myflux-processor:0.9.4'
-    compile project(':myflux-lib')
-    provided project(':myflux-processor')
+    compile 'com.github.bluzwong:myflux-lib:0.9.3@aar'
+    provided 'com.github.bluzwong:myflux-processor:0.9.4'
+//    compile project(':myflux-lib')
+//    provided project(':myflux-processor')
 
 }
