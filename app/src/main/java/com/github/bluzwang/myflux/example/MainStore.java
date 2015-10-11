@@ -20,6 +20,9 @@ public class MainStore extends FluxStore {
 
     @Maintain
     double wsd;
+
+    @Maintain
+    String wsdccf;
     public MainStore(FluxDispatcher dispatcher) {
         super(dispatcher);
     }
@@ -33,4 +36,5 @@ public class MainStore extends FluxStore {
     protected void onDataRestored(SavedData savedData) {
         Log.i("bruce", "date restrored -------------------> \nwsd = " + fuckingCcf + " \nccf = "  + ccf);
     }
+
 }

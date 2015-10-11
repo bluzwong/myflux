@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class MainActivity extends BaseFluxActivity {
 
-    MainStore store = new MainStore(DispatcherHolder.dispatcher);
+    MainStore store = new SonMainStore(DispatcherHolder.dispatcher);
     @Override
     protected int provideContentId() {
         return R.layout.activity_main;
