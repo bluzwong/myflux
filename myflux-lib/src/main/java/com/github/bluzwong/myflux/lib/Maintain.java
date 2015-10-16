@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/24.
  */
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Maintain {
 }
