@@ -60,7 +60,6 @@ public class ClassInjector {
         builder.append("return;\n}\n");
 
         builder.append(originClassName).append(" target = (").append(originClassName).append(") obj;\n");
-        builder.append("Object tmp;\n");
         for (FieldInjector methodInjector : fields) {
             builder.append(methodInjector.brewJavaRestore());
         }

@@ -4,8 +4,8 @@ import android.util.Log;
 
 import com.github.bluzwong.myflux.lib.FluxDispatcher;
 import com.github.bluzwong.myflux.lib.FluxStore;
+import com.github.bluzwong.myflux.lib.*;
 import com.github.bluzwong.myflux.lib.SavedData;
-import com.github.bluzwong.myflux.lib.Maintain;
 
 import java.util.Map;
 
@@ -21,8 +21,17 @@ public class MainStore extends FluxStore {
     @Maintain
     double wsd;
 
-    @Maintain
+    @MaintainProperty
     String wsdccf;
+
+    public String getWsdccf() {
+        return wsdccf;
+    }
+
+    public void setWsdccf(String wsdccf) {
+        this.wsdccf = wsdccf;
+    }
+
     public MainStore(FluxDispatcher dispatcher) {
         super(dispatcher);
     }

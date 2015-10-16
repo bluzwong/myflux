@@ -5,7 +5,7 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 apply plugin: 'java'
-version="0.9.4"  // The version
+version="0.9.9"  // The version
 group = 'com.github.bluzwong'
 task sourceJar(type: Jar) {
     from sourceSets.main.allSource

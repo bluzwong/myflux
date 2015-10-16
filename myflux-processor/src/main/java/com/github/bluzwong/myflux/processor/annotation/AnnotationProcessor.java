@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/24.
  */
-@SupportedAnnotationTypes({"com.github.bluzwong.myflux.lib.Maintain"})
+@SupportedAnnotationTypes({"com.github.bluzwong.myflux.lib.Maintain", "com.github.bluzwong.myflux.lib.MaintainProperty"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class AnnotationProcessor extends AbstractProcessor{
 
@@ -86,6 +86,7 @@ public class AnnotationProcessor extends AbstractProcessor{
 
         for (TypeElement te : annotations) {
             // te = zhujie
+            String annoName = te.getSimpleName().toString();
             for (Element e : roundEnv.getElementsAnnotatedWith(te)) {
                 //log("work on -> " + e.toString());
                 Name fieldName = e.getSimpleName();
@@ -95,7 +96,11 @@ public class AnnotationProcessor extends AbstractProcessor{
                 log("fieldType -> " + e.asType().toString());
 //                log("simplename" + e.getSimpleName());
                 ClassInjector injector = getOrCreateTargetClass(targetClassMap, className);
-                FieldInjector methodInjector = new FieldInjector(fieldName.toString(), e.asType().toString());
+                boolean isProperty = false;
+                if (annoName.equals("MaintainProperty")) {
+                    isProperty = true;
+                }
+                FieldInjector methodInjector = new FieldInjector(fieldName.toString(), e.asType().toString(), isProperty);
                 injector.addField(methodInjector);
             }
 

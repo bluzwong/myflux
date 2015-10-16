@@ -1,5 +1,6 @@
 package com.github.bluzwong.myflux.processor.inject;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,22 +10,33 @@ import java.util.Map;
 public class FieldInjector {
     private String fieldName;
     private String type;
-    public FieldInjector(String fieldName, String type) {
+    private boolean isProperty;
+    public FieldInjector(String fieldName, String type, boolean isProperty) {
         this.fieldName = fieldName;
         this.type = type;
+        this.isProperty = isProperty;
     }
 
     public String brewJava() throws Exception{
         StringBuilder builder = new StringBuilder();
-        builder.append("savingData.put(\"").append(fieldName).append("\", target.").append(fieldName).append(");\n");
+        String fixField = fieldName;
+        if (isProperty) {
+            fixField = "get" + firstLetterToUpper(fieldName) + "()";
+        }
+        builder.append("savingData.put(\"").append(fieldName).append("\", target.").append(fixField).append(");\n");
+
         return builder.toString();
     }
 
     public String brewJavaRestore()  {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("tmp = savedData.get(\"" + fieldName + "\");\n");
-        builder.append("target." + fieldName).append("= ( " + type +")tmp;\n");
+        String tmp = "savedData.get(\"" + fieldName + "\")";
+        if (isProperty) {
+            builder.append("target.set" + firstLetterToUpper(fieldName) + "(" + "( " + type + ")"+tmp+");\n");
+        } else {
+            builder.append("target." + fieldName).append("= ( " + type + ")"+tmp+";\n");
+        }
         return builder.toString();
     }
     public static void main(String[] args) {
@@ -37,5 +49,10 @@ public class FieldInjector {
        // String aaa = clz.cast(o);
         //System.out.println(aaa);
         nameTypes.put(fieldName, s.getClass().getCanonicalName());
+    }
+    public static String firstLetterToUpper(String str){
+        char[] array = str.toCharArray();
+        array[0] -= 32;
+        return String.valueOf(array);
     }
 }
