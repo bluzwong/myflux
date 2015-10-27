@@ -16,13 +16,16 @@ import java.util.Random;
 
 public class MainActivity extends BaseFluxActivity {
 
+    // activity保存状态的store,当前activity对应的store 一个activity对应一个store实例
     MainStore store = new MainStore(FluxDispatcher.INSTANCE);
-    static MainRequester requester = new MainRequester();
+    // 发送请求的helper
+    MainRequester requester = new MainRequester();
 
     Button btnAdd, btnRemove;
     ScrollView scrollView;
     TextView textView;
     ProgressDialog dialog;
+
     /**
      * 当前activity使用的layout,代替setContentView()
      * @return
@@ -53,6 +56,7 @@ public class MainActivity extends BaseFluxActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // 点击添加按钮尝试添加
                 tryRequestAdd();
             }
         });
@@ -60,6 +64,7 @@ public class MainActivity extends BaseFluxActivity {
         btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // 点击移除按钮 尝试移除最后一条
                 tryRemove();
             }
         });
@@ -72,6 +77,7 @@ public class MainActivity extends BaseFluxActivity {
      */
     @Override
     protected void onNewView() {
+        // 第一次进入时请求添加
         tryRequestAdd();
     }
 
@@ -80,6 +86,7 @@ public class MainActivity extends BaseFluxActivity {
      */
     @Override
     protected void onRestoreView() {
+        // 从旋转恢复时,如果之前还在请求则显示dialog
         if (store.isRequesting) {
             showLoadingDialog();
         }
@@ -90,13 +97,18 @@ public class MainActivity extends BaseFluxActivity {
      * @param type
      * @param dataMap
      */
+    // 一个耗时请求变成数据的流向 UI => Requester => Store => UI
+    // 一个不耗时的请求的流向 UI <=> Store
     @Override
     protected void onResponse(String type, Map<String, Object> dataMap) {
+        // 这里的type就是store发送的type
         switch (type) {
+            // 请求添加完成时,dismiss界面上的dialog,把store的isrequesting状态修改false
             case RequestType.REQUEST_ADD:
                 store.isRequesting = false;
                 dismissLoadingDialog();
 
+                // 请求添加完成 或者恢复ui时,把text设置到界面上
             case RequestType.RESTORE_UI:
                 textView.setText(store.text);
                 break;
@@ -104,15 +116,24 @@ public class MainActivity extends BaseFluxActivity {
         }
     }
 
+    /**
+     * 耗时请求
+     */
     private void tryRequestAdd() {
+        // 如果在请求则不再请求
         if (!store.isRequesting) {
             store.isRequesting = true;
             showLoadingDialog();
+            // 使用请求helper来处理耗时的数据,hashcode必须使用本类,不然可能接收不到数据
             requester.requestAdd(hashCode(), "random data : " + new Random().nextInt(100));
         }
     }
 
+    /**
+     * 不耗时请求
+     */
     private void tryRemove() {
+        // 如果在请求则不执行
         if (store.isRequesting) {
             return;
         }
