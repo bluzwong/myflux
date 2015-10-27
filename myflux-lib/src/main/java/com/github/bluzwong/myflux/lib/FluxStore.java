@@ -32,10 +32,13 @@ public abstract class FluxStore {
 
     @Subscriber
     public void onReceiveRequestDone(FluxAction action) {
-        if (owner != action.getOwner()) {
+        int actionOwner = action.getOwner();
+        if (actionOwner <= 0) {
             return;
         }
-        onRequestDone(action.getType(), action.getDataMap());
+        if (actionOwner == owner || actionOwner == savedOwner) {
+            onRequestDone(action.getType(), action.getDataMap());
+        }
     }
 
     /**
