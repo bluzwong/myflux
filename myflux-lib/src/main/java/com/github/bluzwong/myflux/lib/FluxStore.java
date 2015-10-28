@@ -4,6 +4,8 @@ package com.github.bluzwong.myflux.lib;
 import android.os.Bundle;
 import org.simple.eventbus.Subscriber;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,7 +21,8 @@ public abstract class FluxStore {
 
     private IMaintain maintain = MaintainFactory.create(this);
     private int owner = -1; // current view
-    private int savedOwner = -1; // view before recreate
+    private List<Integer> historyOwnerList = new ArrayList<>(); // view before
+    private int savedOwner = -1; // last before recreate
     private Runnable restoreViewFunc; // view restore func to run after data restored
     private boolean haveSavedBundle = false;
 
@@ -36,7 +39,7 @@ public abstract class FluxStore {
         if (actionOwner <= 0) {
             return;
         }
-        if (actionOwner == owner || actionOwner == savedOwner) {
+        if (actionOwner == owner || actionOwner == savedOwner || historyOwnerList.contains(actionOwner)) {
             onRequestDone(action.getType(), action.getDataMap());
         }
     }
@@ -58,6 +61,7 @@ public abstract class FluxStore {
         if (maintain == null) {
             throw new IllegalArgumentException("can not create maintain instance ,check dependence");
         }
+        historyOwnerList.addAll((List<Integer>) savedData.get("historyOwnerList"));
         // maintain is created by apt
         maintain.autoRestore(this, savedData);
         onDataRestored(savedData);
@@ -82,6 +86,7 @@ public abstract class FluxStore {
         }
         // maintain is created by apt
         maintain.autoSave(this, savedData);
+        savedData.put("historyOwnerList", historyOwnerList);
         dispatcher.getEventBus().postSticky(savedData);
         stickyCount++;
         haveSavedBundle = true;
@@ -92,6 +97,7 @@ public abstract class FluxStore {
             return false;
         }
         savedOwner = bundle.getInt("ownerHashCode", -1);
+        historyOwnerList.add(savedOwner);
         return savedOwner != -1;
     }
 

@@ -38,7 +38,7 @@ public class MainStore extends FluxStore {
 
     // requester完成后通过时间调度器发送的消息会到此接受
     // 这里只进行简单的数据处理 保存,然后发消息给ui(也就是activity)更新界面
-    // 一个耗时请求变成数据的流向 UI => Requester => Store => UI
+    // 一个耗时请求数据的流向 UI => Requester => Store => UI
     // 一个不耗时的请求的流向 UI <=> Store
     @Override
     protected void onRequestDone(String type, Map<String, Object> dataMap) {

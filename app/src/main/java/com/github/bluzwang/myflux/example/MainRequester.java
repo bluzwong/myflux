@@ -8,7 +8,7 @@ import com.github.bluzwong.myflux.lib.FluxDispatcher;
 
 /**
  * 在这里做耗时的数据请求(网络或者数据库等)
- *  一个耗时请求变成数据的流向 UI => Requester => Store => UI
+ *  一个耗时请求数据的流向 UI => Requester => Store => UI
  *  一个不耗时的请求的流向 UI <=> Store
  */
 public class MainRequester {
@@ -16,13 +16,13 @@ public class MainRequester {
     FluxDispatcher dispatcher = FluxDispatcher.INSTANCE;
 
     // 方法内使用异步的方式请求数据,凡是耗时的任务全要在此进行
-    public void requestAdd(int hashCode, String data) {
+    public void requestAdd(final int hashCode, final String data) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     // 模拟请求,处理数据的耗时
-                    Thread.sleep(2000);
+                    Thread.sleep(5000);
                     String result = data + " -> after request";
 
                     // 处理完成后 通过调度器发送消息给store,处理完的数据通过 key value来传递, 这里的type就是store中接收的type.
