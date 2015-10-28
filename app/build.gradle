@@ -26,11 +26,11 @@ repositories {
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'org.simple:androideventbus:latest'
+    //compile 'org.simple:androideventbus:latest'
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:design:22.2.1'
 
-    compile 'com.github.bluzwong:myflux-lib:1.0.1@aar'
+    compile ('com.github.bluzwong:myflux-lib:1.0.1@aar') { transitive = true }
     apt 'com.github.bluzwong:myflux-processor:0.9.9'
 //    compile project(':myflux-lib')
 //    apt project(':myflux-processor')
