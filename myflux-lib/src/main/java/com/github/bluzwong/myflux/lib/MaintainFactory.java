@@ -30,7 +30,7 @@ public class MaintainFactory {
         }
         IMaintain iMaintain = null;
         try {
-            Class<?> maintainClz = Class.forName(clz.getCanonicalName() + "$$Maintain");
+            Class<?> maintainClz = Class.forName(clz.getCanonicalName() + "_Maintain");
             iMaintain = (IMaintain) maintainClz.newInstance();
         } catch (ClassNotFoundException e) {
             iMaintain = findMaintainClass(clz.getSuperclass());

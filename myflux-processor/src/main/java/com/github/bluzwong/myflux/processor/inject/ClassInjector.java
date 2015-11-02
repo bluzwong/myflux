@@ -14,7 +14,7 @@ public class ClassInjector {
     private final String className;
     private final String originClassName;
     private final Set<FieldInjector> fields;
-    private static final String SUFFIX = "$$Maintain";
+    private static final String SUFFIX = "_Maintain";
 
     public ClassInjector(String classPackage, String className) {
         this.classPackage = classPackage;

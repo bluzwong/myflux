@@ -3,7 +3,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
 group = 'com.github.bluzwong'
-version = '1.0.2'
+version = '1.0.3'
 def siteUrl = 'https://github.com/bluzwong/myflux'
 def gitUrl = 'https://github.com/bluzwong/myflux'
 
