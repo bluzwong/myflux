@@ -25,6 +25,9 @@ public class MaintainFactory {
     }
 
     private static IMaintain findMaintainClass(Class<?> clz) {
+        if (clz == null) {
+            return null;
+        }
         IMaintain iMaintain = null;
         try {
             Class<?> maintainClz = Class.forName(clz.getCanonicalName() + "$$Maintain");

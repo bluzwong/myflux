@@ -58,12 +58,12 @@ public abstract class FluxStore {
         if (--stickyCount == 0) {
             dispatcher.getEventBus().removeStickyEvent(SavedData.class);
         }
-        if (maintain == null) {
-            throw new IllegalArgumentException("can not create maintain instance ,check dependence");
-        }
+
         historyOwnerList.addAll((List<Integer>) savedData.get("historyOwnerList"));
         // maintain is created by apt
-        maintain.autoRestore(this, savedData);
+        if (maintain != null) {
+            maintain.autoRestore(this, savedData);
+        }
         onDataRestored(savedData);
         if (restoreViewFunc != null) {
             restoreViewFunc.run();
@@ -81,11 +81,10 @@ public abstract class FluxStore {
         outState.putInt("ownerHashCode", owner);
         SavedData savedData = new SavedData(owner);
         onPreSavingData(savedData);
-        if (maintain == null) {
-            throw new IllegalArgumentException("can not create maintain instance ,check dependence");
-        }
         // maintain is created by apt
-        maintain.autoSave(this, savedData);
+        if (maintain != null) {
+            maintain.autoSave(this, savedData);
+        }
         savedData.put("historyOwnerList", historyOwnerList);
         dispatcher.getEventBus().postSticky(savedData);
         stickyCount++;
