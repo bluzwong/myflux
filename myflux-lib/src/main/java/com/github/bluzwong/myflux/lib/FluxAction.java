@@ -9,11 +9,24 @@ public class FluxAction {
     private String type;
     private int owner;
     private Map<String, Object> dataMap;
-
-    public FluxAction(String type, int owner, Map<String, Object> dataMap) {
+    private String requestUUID;
+    public FluxAction(String type, int owner, Map<String, Object> dataMap, String requestUUID) {
         this.type = type;
         this.owner = owner;
         this.dataMap = dataMap;
+        this.requestUUID = requestUUID;
+    }
+
+    public FluxAction(String type, int owner, Map<String, Object> dataMap) {
+        this(type, owner, dataMap, "");
+    }
+
+    public String getRequestUUID() {
+        return requestUUID;
+    }
+
+    public void setRequestUUID(String requestUUID) {
+        this.requestUUID = requestUUID;
     }
 
     public String getType() {

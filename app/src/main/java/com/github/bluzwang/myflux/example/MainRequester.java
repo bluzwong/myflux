@@ -16,7 +16,8 @@ public class MainRequester {
     FluxDispatcher dispatcher = FluxDispatcher.INSTANCE;
 
     // 方法内使用异步的方式请求数据,凡是耗时的任务全要在此进行
-    public void requestAdd(final int hashCode, final String data) {
+    public String requestAdd(final int hashCode, final String data) {
+        final String uuid = FluxDispatcher.createUUID();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -28,13 +29,14 @@ public class MainRequester {
                     // 处理完成后 通过调度器发送消息给store,处理完的数据通过 key value来传递, 这里的type就是store中接收的type.
                     // 这里的hashcode是发送者的hashcode,也就是activity传入的hashCode().内部使用hashcode来判断每个请求的拥有者.
                     dispatcher.dispatchRequestToStoreWithType(RequestType.REQUEST_ADD, hashCode)
-                            .key(RequestType.KEY_DATA).toValue(result)
-                            .post();
+                            .withData(RequestType.KEY_DATA, result)
+                            .post(uuid);
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+        return uuid;
     }
 }

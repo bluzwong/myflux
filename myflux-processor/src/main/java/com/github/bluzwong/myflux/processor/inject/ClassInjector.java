@@ -52,6 +52,7 @@ public class ClassInjector {
             builder.append(methodInjector.brewJava());
         }
 
+        builder.append("savingData.put(\"cancelledRequest\", target.cancelledRequest);\n");
         builder.append("}\n"); // end of method
 
         // method restore
@@ -63,6 +64,8 @@ public class ClassInjector {
         for (FieldInjector methodInjector : fields) {
             builder.append(methodInjector.brewJavaRestore());
         }
+
+        builder.append("target.cancelledRequest= ( List<String>)savedData.get(\"cancelledRequest\");");
         builder.append("}\n"); // end of method
         builder.append("}\n"); // end of class
         return builder.toString();

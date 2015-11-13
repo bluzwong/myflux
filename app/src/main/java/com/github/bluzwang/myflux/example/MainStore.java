@@ -41,7 +41,7 @@ public class MainStore extends FluxStore {
     // 一个耗时请求数据的流向 UI => Requester => Store => UI
     // 一个不耗时的请求的流向 UI <=> Store
     @Override
-    protected void onRequestDone(String type, Map<String, Object> dataMap) {
+    protected void onRequestDone(String type, Map<String, Object> dataMap, String requestUUID) {
         // 这里的type就是requester通过 dispatcher.dispatchRequestToStoreWithType() 发送的type
         switch (type) {
             case RequestType.REQUEST_ADD:

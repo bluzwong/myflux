@@ -2,6 +2,7 @@ package com.github.bluzwong.myflux.lib;
 
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import org.simple.eventbus.Subscriber;
 
 import java.util.ArrayList;
@@ -26,12 +27,20 @@ public abstract class FluxStore {
     private Runnable restoreViewFunc; // view restore func to run after data restored
     private boolean haveSavedBundle = false;
 
+    @Maintain
+    public List<String> cancelledRequest = new ArrayList<>();
+
+    public void cancelRequest(String requestUUID) {
+        if (!cancelledRequest.contains(requestUUID)) {
+            cancelledRequest.add(requestUUID);
+        }
+    }
     /**
      * called when dispatcher request finish
      * @param type request type
      * @param dataMap datamap
      */
-    protected abstract void onRequestDone(String type, Map<String, Object> dataMap);
+    protected abstract void onRequestDone(String type, Map<String, Object> dataMap, String requestUUID);
 
     @Subscriber
     public void onReceiveRequestDone(FluxAction action) {
@@ -40,7 +49,12 @@ public abstract class FluxStore {
             return;
         }
         if (actionOwner == owner || actionOwner == savedOwner || historyOwnerList.contains(actionOwner)) {
-            onRequestDone(action.getType(), action.getDataMap());
+            String thisUUID = action.getRequestUUID();
+            if (!TextUtils.isEmpty(thisUUID) && cancelledRequest.contains(thisUUID)) {
+                // this request is cancelled
+                return;
+            }
+            onRequestDone(action.getType(), action.getDataMap(), thisUUID);
         }
     }
 

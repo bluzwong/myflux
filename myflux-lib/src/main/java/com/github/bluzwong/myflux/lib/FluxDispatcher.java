@@ -3,10 +3,7 @@ package com.github.bluzwong.myflux.lib;
 import android.text.TextUtils;
 import org.simple.eventbus.EventBus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/25.
@@ -22,7 +19,9 @@ public enum FluxDispatcher {
     public EventBus getEventBus() {
         return eventBus;
     }
-
+    public static String createUUID() {
+        return UUID.randomUUID().toString();
+    }
     public void register(Object obj) {
         if (!registeredObj.contains(obj)) {
             registeredObj.add(obj);
@@ -79,22 +78,20 @@ public enum FluxDispatcher {
         }
 
         private Map<String, Object> data = new HashMap<String, Object>();
-        private String tmpKey;
 
-        public ActionBuilder key(String key) {
-            tmpKey = key;
-            return this;
-        }
-        public ActionBuilder toValue(Object obj) {
-            if (TextUtils.isEmpty(tmpKey)) {
+        public ActionBuilder withData(String key, Object obj) {
+            if (TextUtils.isEmpty(key)) {
                 throw new IllegalArgumentException("key is null");
             }
-            data.put(tmpKey, obj);
-            tmpKey = null;
+            data.put(key, obj);
             return this;
         }
+        public void post(String requestUUID) {
+            postToBus(new FluxAction(type, owner, data, requestUUID));
+        }
+
         public void post() {
-            postToBus(new FluxAction(type, owner, data));
+            post("");
         }
     }
     public class ResponseBuilder {
@@ -107,18 +104,17 @@ public enum FluxDispatcher {
         }
 
         private Map<String, Object> data = new HashMap<String, Object>();
-        private String tmpKey;
 
-        public ResponseBuilder key(String key) {
-            tmpKey = key;
-            return this;
-        }
-        public ResponseBuilder toValue(Object obj) {
-            if (TextUtils.isEmpty(tmpKey)) {
+        public ResponseBuilder withData(String key, Object obj) {
+            if (TextUtils.isEmpty(key)) {
                 throw new IllegalArgumentException("key is null");
             }
-            data.put(tmpKey, obj);
-            tmpKey = null;
+            data.put(key, obj);
+            return this;
+        }
+
+        public ResponseBuilder withDatas(Map<String, Object> datas) {
+            data.putAll(datas);
             return this;
         }
         public void post() {
