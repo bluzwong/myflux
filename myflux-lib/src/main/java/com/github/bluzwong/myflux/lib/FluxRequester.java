@@ -1,7 +1,6 @@
 package com.github.bluzwong.myflux.lib;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -32,7 +31,7 @@ public class FluxRequester {
         void request(final String requestUUID);
     }
 
-    protected String createRequest(final RequestAction action, Scheduler scheduler) {
+    protected String createRequest(Scheduler scheduler, final RequestAction action) {
         final String uuid = createUUID();
         Observable.just(action)
                 .observeOn(scheduler)
@@ -52,22 +51,22 @@ public class FluxRequester {
     }
 
     protected String createRequestIO(final RequestAction action) {
-        return createRequest(action, Schedulers.io());
+        return createRequest(Schedulers.io(), action);
     }
 
     protected String createRequestComputation(final RequestAction action) {
-        return createRequest(action, Schedulers.computation());
+        return createRequest(Schedulers.computation(), action);
     }
 
     protected String createRequestNewThread(final RequestAction action) {
-        return createRequest(action, Schedulers.newThread());
+        return createRequest(Schedulers.newThread(), action);
     }
 
     protected String createRequestMainThread(final RequestAction action) {
-        return createRequest(action, AndroidSchedulers.mainThread());
+        return createRequest(AndroidSchedulers.mainThread(), action);
     }
 
     protected String createRequestCurrent(final RequestAction action) {
-        return createRequest(action, Schedulers.immediate());
+        return createRequest(Schedulers.immediate(), action);
     }
 }

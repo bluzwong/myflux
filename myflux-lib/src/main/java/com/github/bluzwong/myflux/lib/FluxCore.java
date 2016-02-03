@@ -29,13 +29,13 @@ public enum FluxCore {
         init();
     }
 
-    private final Map<String, FluxReceiver> receiverMaps = new HashMap<String, FluxReceiver>();
+    final Map<String, FluxReceiver> receiverMaps = new HashMap<String, FluxReceiver>();
 
-    public void register(FluxReceiver receiver, String receiverId) {
+    public void register(String receiverId,FluxReceiver receiver) {
         receiverMaps.put(receiverId, receiver);
     }
 
-    public void unregister(FluxReceiver receiver, String receiverId) {
+    public void unregister(String receiverId, FluxReceiver receiver) {
         if (receiver == null) {
             return;
         }
@@ -80,7 +80,15 @@ public enum FluxCore {
         dispatcher.dispatchType(target, dataMap, type);
     }
 
-    private static void switchReceiveTypeReflect(Object target, Map<String, Object> dataMap, String type) {
+    public static void switchReceiveTypeApt(Object target, Map<String, Object> dataMap, String type) {
+        ReceiveTypeDispatcher dispatcher = DispatcherFactory.create(target);
+        if (dispatcher == null) {
+            return;
+        }
+        dispatcher.dispatchType(target, dataMap, type);
+    }
+
+    public static void switchReceiveTypeReflect(Object target, Map<String, Object> dataMap, String type) {
         for (Method method : target.getClass().getDeclaredMethods()) {
             ReceiveType annotation = method.getAnnotation(ReceiveType.class);
             if (annotation == null) {

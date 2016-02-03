@@ -29,11 +29,11 @@ public class DemoActivity extends Activity implements FluxReceiver {
         }
         setContentView(R.layout.activity_flux);
         requester = new DemoRequester(receiverUUID);
-        FluxCore.INSTANCE.register(this, receiverUUID);
+        FluxCore.INSTANCE.register(receiverUUID, this);
         findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requester.requestSum(1, 2);
+                requester.requestSumDelay(1, 2);
             }
         });
     }
@@ -46,31 +46,49 @@ public class DemoActivity extends Activity implements FluxReceiver {
 
     @Override
     public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
+        // 使用apt解析注解
+//        FluxCore.switchReceiveTypeApt(this, dataMap, type);
+        // 使用反射解析注解 效率没有apt高
+//        FluxCore.switchReceiveTypeReflect(this, dataMap, type);
+
+        // 优先使用apt apt不可用时 使用反射
         FluxCore.switchReceiveType(this, dataMap, type);
     }
 
-    @ReceiveType(type = {"ccf"})
+    int[] receives = {0, 0, 0, 0};
+
+    public void clearReceives() {
+        for (int i = 0; i < receives.length; i++) {
+            receives[i] = 0;
+        }
+    }
+
+    @ReceiveType(type = {"1"})
     void doCcf(Map<String, Object> dataMap) {
         int sum = (int) dataMap.get("sum");
-        Toast.makeText(this, "a + b => " + sum, Toast.LENGTH_SHORT).show();
+        receives[0] = sum;
+        Toast.makeText(this, "1111 a + b => " + sum, Toast.LENGTH_SHORT).show();
     }
 
-    @ReceiveType(type = "ccf")
+    @ReceiveType(type = "2")
     void doCcf(Map<String, Object> dataMap, String type) {
         int sum = (int) dataMap.get("sum");
-        Toast.makeText(this, "a + b 2=> " + sum, Toast.LENGTH_SHORT).show();
+        receives[1] = sum;
+        Toast.makeText(this, "2222 a + b 2=> " + sum, Toast.LENGTH_SHORT).show();
     }
 
-      @ReceiveType(type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI})
+    @ReceiveType(type = {"1", "2"})
     void dowsd(Map<String, Object> dataMap, String type) {
         int sum = (int) dataMap.get("sum");
-        Toast.makeText(this, "a + b 2=> " + sum, Toast.LENGTH_SHORT).show();
+        receives[2] = sum;
+        Toast.makeText(this, "3333 a + b 2=> " + sum, Toast.LENGTH_SHORT).show();
     }
 
     @ReceiveType(type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI})
     void dowsd(Map<String, Object> dataMap) {
         int sum = (int) dataMap.get("sum");
-        Toast.makeText(this, "a + b 2=> " + sum, Toast.LENGTH_SHORT).show();
+        receives[3] = sum;
+        Toast.makeText(this, "4444 a + b 2=> " + sum, Toast.LENGTH_SHORT).show();
     }
 
 }

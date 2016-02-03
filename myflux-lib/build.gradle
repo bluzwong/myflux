@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
@@ -26,6 +26,8 @@ dependencies {
 //    compile fileTree(dir: 'libs', include: ['*.jar'])
     //compile 'org.simple:androideventbus:latest'
     compile 'com.hwangjr.rxbus:rxbus:1.0.2'
+    testCompile 'junit:junit:4.12'
+    testCompile ('org.robolectric:robolectric:3.0-rc3')
 }
 buildscript {
     repositories {

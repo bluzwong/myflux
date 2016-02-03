@@ -8,7 +8,6 @@ package com.github.bluzwang.myflux.example;
  * 所有的key type String
  */
 public interface RequestType {
-    String REQUEST_ADD = "request add";
-    String RESTORE_UI = "restore ui";
-    String KEY_DATA = "key data";
+    String REQUEST_ADD = "1";
+    String RESTORE_UI = "2";
 }
