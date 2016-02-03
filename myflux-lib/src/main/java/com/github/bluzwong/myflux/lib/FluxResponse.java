@@ -1,42 +1,56 @@
 package com.github.bluzwong.myflux.lib;
 
+import com.hwangjr.rxbus.RxBus;
+
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by wangzhijie@wind-mobi.com on 2015/9/25.
+ * Created by bluzwong on 2016/2/3.
  */
-public class FluxResponse {
-    private String type;
-    private int owner;
+public final class FluxResponse {
     private Map<String, Object> dataMap;
+    private String type;
+    private String requestUUID;
+    private String receiverId;
 
-    public FluxResponse(String type, int owner, Map<String, Object> dataMap) {
+    private FluxResponse(String receiverId, String type, String requestUUID) {
         this.type = type;
-        this.owner = owner;
-        this.dataMap = dataMap;
+        this.receiverId = receiverId;
+        this.requestUUID = requestUUID;
+        dataMap = new HashMap<String, Object>();
     }
 
-    public String getType() {
-        return type;
+    public static FluxResponse create(String receiverId, String type, String requestUUID) {
+        return new FluxResponse(receiverId, type, requestUUID);
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public FluxResponse setData(String key, Object data) {
+        dataMap.put(key, data);
+        return this;
     }
 
-    public int getOwner() {
-        return owner;
-    }
-
-    public void setOwner(int owner) {
-        this.owner = owner;
+    public void post() {
+        RxBus.get().post(this);
     }
 
     public Map<String, Object> getDataMap() {
         return dataMap;
     }
 
-    public void setDataMap(Map<String, Object> dataMap) {
-        this.dataMap = dataMap;
+
+    public String getType() {
+        return type;
     }
+
+
+    public String getRequestUUID() {
+        return requestUUID;
+    }
+
+
+    public String getReceiverId() {
+        return receiverId;
+    }
+
 }

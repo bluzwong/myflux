@@ -24,9 +24,8 @@ android {
 
 dependencies {
 //    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'org.simple:androideventbus:latest'
-    compile 'com.android.support:appcompat-v7:22.2.1'
-
+    //compile 'org.simple:androideventbus:latest'
+    compile 'com.hwangjr.rxbus:rxbus:1.0.2'
 }
 buildscript {
     repositories {

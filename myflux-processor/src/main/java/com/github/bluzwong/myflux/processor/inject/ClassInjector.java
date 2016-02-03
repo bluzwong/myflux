@@ -1,9 +1,6 @@
 package com.github.bluzwong.myflux.processor.inject;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by geminiwen on 15/5/21.
@@ -13,61 +10,54 @@ public class ClassInjector {
     private final String classPackage;
     private final String className;
     private final String originClassName;
-    private final Set<FieldInjector> fields;
-    private static final String SUFFIX = "_Maintain";
+    private final Set<MethodInjector> methods;
+    private final List<String> types = new ArrayList<String>();
+    private static final String SUFFIX = "_Flux_Dispatcher";
 
     public ClassInjector(String classPackage, String className) {
         this.classPackage = classPackage;
         this.originClassName = className;
         this.className = className + SUFFIX;
-        this.fields = new LinkedHashSet<FieldInjector>();
+        this.methods = new LinkedHashSet<MethodInjector>();
     }
 
-    public void addField(FieldInjector e) {
-        fields.add(e);
+    public void addMethod(MethodInjector e) {
+        methods.add(e);
     }
-
+    public void addType(String type) {
+        if (types.contains(type)) {
+            return;
+        }
+        types.add(type);
+    }
     public String getFqcn() {
         return classPackage + "." + className;
     }
 
-    public static void main(String[] args) {
-        String ccf = "";
-        Map<String, String> nameTypes = new HashMap<String, String>();
 
-    }
     public String brewJava() throws Exception {
-        StringBuilder builder = new StringBuilder("package " + this.classPackage + ";\n");
-        builder.append("import com.github.bluzwong.myflux.lib.*;\n");
-        builder.append("import java.util.ArrayList;\n");
-        builder.append("import java.util.List;\n");
+        StringBuilder builder = new StringBuilder();
+        builder.append("package ").append(classPackage).append(";\n");
+        builder.append("import com.github.bluzwong.myflux.lib.switchtype.ReceiveTypeDispatcher;\n");
+        builder.append("import java.util.Map;\n");
+        builder.append("public class ").append(className).append(" implements ReceiveTypeDispatcher {\n");
+        builder.append("@Override\n");
+        builder.append("public void dispatchType(Object target, Map<String, Object> dataMap, String type) {\n");
+        builder.append(originClassName).append(" receiver = (").append(originClassName).append(") target;\n");
+        builder.append("switch(type) {\n");
 
-        builder.append("public class ").append(this.className).append(" implements IMaintain {\n");
-
-        builder.append("@Override public  void autoSave(Object obj, SavedData savingData) {\n"); // start of method
-        builder.append("if (obj == null || savingData == null) {\n");
-        builder.append("return;\n}\n");
-        builder.append(originClassName).append(" target = (").append(originClassName).append(") obj;\n");
-        for (FieldInjector methodInjector : fields) {
-            builder.append(methodInjector.brewJava());
+        for (String type : types) {
+            builder.append("case ").append(type).append(" : {\n");
+            for (MethodInjector method : methods) {
+                builder.append(method.brewInvokeType(type));
+            }
+            builder.append("break;\n");
+            builder.append("}\n");
         }
 
-        builder.append("savingData.put(\"cancelledRequest\", target.cancelledRequest);\n");
-        builder.append("}\n"); // end of method
-
-        // method restore
-        builder.append("@Override public  void autoRestore(Object obj, SavedData savedData)  {\n"); // start of method
-        builder.append("if (obj == null || savedData == null) {\n");
-        builder.append("return;\n}\n");
-
-        builder.append(originClassName).append(" target = (").append(originClassName).append(") obj;\n");
-        for (FieldInjector methodInjector : fields) {
-            builder.append(methodInjector.brewJavaRestore());
-        }
-
-        builder.append("target.cancelledRequest= ( List<String>)savedData.get(\"cancelledRequest\");");
-        builder.append("}\n"); // end of method
-        builder.append("}\n"); // end of class
+        builder.append("}\n");
+        builder.append("}\n");
+        builder.append("}\n");
         return builder.toString();
     }
 }

@@ -3,11 +3,12 @@ package com.github.bluzwong.myflux.processor.annotation;
 
 
 import com.github.bluzwong.myflux.processor.inject.ClassInjector;
-import com.github.bluzwong.myflux.processor.inject.FieldInjector;
+import com.github.bluzwong.myflux.processor.inject.MethodInjector;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -15,13 +16,15 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.Writer;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/24.
  */
-@SupportedAnnotationTypes({"com.github.bluzwong.myflux.lib.Maintain", "com.github.bluzwong.myflux.lib.MaintainProperty"})
+@SupportedAnnotationTypes({"com.github.bluzwong.myflux.lib.switchtype.ReceiveType"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class AnnotationProcessor extends AbstractProcessor{
 
@@ -29,6 +32,7 @@ public class AnnotationProcessor extends AbstractProcessor{
     private Filer filer;
     private Elements elementUtils;
     private Types typeUtils;
+    private boolean LOG_OFF = false;
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
@@ -89,19 +93,45 @@ public class AnnotationProcessor extends AbstractProcessor{
             String annoName = te.getSimpleName().toString();
             for (Element e : roundEnv.getElementsAnnotatedWith(te)) {
                 //log("work on -> " + e.toString());
-                Name fieldName = e.getSimpleName();
-                log("fieldName -> " + fieldName); //
+                Name methodName = e.getSimpleName();
+
+                ExecutableElement executableElement = (ExecutableElement) e;
+                List<? extends AnnotationMirror> annotationMirrors = executableElement.getAnnotationMirrors();
+
+                log("methodName -> " + methodName); // methodName -> doCcf
                 TypeElement className = (TypeElement) e.getEnclosingElement();
-                log("fieldInClass -> " + className); //
-                log("fieldType -> " + e.asType().toString());
+                log("fieldInClass -> " + className); // fieldInClass -> com.github.bluzwang.myflux.example.demo.DemoActivity
+
+
+                log("fieldType -> " + e.asType().toString()); //fieldType -> (java.util.Map<java.lang.String,java.lang.Object>)void
+                // fieldType -> (java.util.Map<java.lang.String,java.lang.Object>,java.lang.String)void
 //                log("simplename" + e.getSimpleName());
-                ClassInjector injector = getOrCreateTargetClass(targetClassMap, className);
-                boolean isProperty = false;
-                if (annoName.equals("MaintainProperty")) {
-                    isProperty = true;
+
+                final MethodInjector methodInjector = new MethodInjector(methodName.toString(), e.asType().toString().startsWith("(java.util.Map<java.lang.String,java.lang.Object>,java.lang.String)"));
+                final ClassInjector injector = getOrCreateTargetClass(targetClassMap, className);
+                for (AnnotationMirror mirror : annotationMirrors) {
+                    DeclaredType annotationType = mirror.getAnnotationType();
+                    log("annotationType => " + annotationType); //annotationType => com.github.bluzwong.myflux.lib.switchtype.ReceiveType
+                    Map<? extends ExecutableElement, ? extends AnnotationValue> values = mirror.getElementValues();
+                    values.forEach(new BiConsumer<ExecutableElement, AnnotationValue>() {
+                        @Override
+                        public void accept(ExecutableElement executableElement, AnnotationValue annotationValue) {
+                            log("executableElement: " + executableElement + " => annotationValue : " + annotationValue);
+                            log("annotationValue cls => " + annotationValue.getValue());
+                            // executableElement: type() => annotationValue : {"ccf"}
+                            // executableElement: type() => annotationValue : {"wsd", "ccf"}
+                            String valueString = annotationValue.getValue().toString();
+                            String[] typeValues = valueString.split(",");
+                            for (String typeValue : typeValues) {
+                                methodInjector.addType(typeValue);
+                                injector.addType(typeValue);
+                            }
+                        }
+                    });
                 }
-                FieldInjector methodInjector = new FieldInjector(fieldName.toString(), e.asType().toString(), isProperty);
-                injector.addField(methodInjector);
+
+                injector.addMethod(methodInjector);
+
             }
 
         }
@@ -147,6 +177,7 @@ public class AnnotationProcessor extends AbstractProcessor{
         return elementUtils.getPackageOf(type).getQualifiedName().toString();
     }
     private void log(String msg) {
+        if (LOG_OFF) { return;}
         processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, msg);
     }
 }
