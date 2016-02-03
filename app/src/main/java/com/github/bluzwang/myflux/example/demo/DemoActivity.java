@@ -61,11 +61,16 @@ public class DemoActivity extends Activity implements FluxReceiver {
         Toast.makeText(this, "a + b 2=> " + sum, Toast.LENGTH_SHORT).show();
     }
 
-    @ReceiveType(type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI})
+      @ReceiveType(type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI})
     void dowsd(Map<String, Object> dataMap, String type) {
         int sum = (int) dataMap.get("sum");
         Toast.makeText(this, "a + b 2=> " + sum, Toast.LENGTH_SHORT).show();
     }
 
+    @ReceiveType(type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI})
+    void dowsd(Map<String, Object> dataMap) {
+        int sum = (int) dataMap.get("sum");
+        Toast.makeText(this, "a + b 2=> " + sum, Toast.LENGTH_SHORT).show();
+    }
 
 }

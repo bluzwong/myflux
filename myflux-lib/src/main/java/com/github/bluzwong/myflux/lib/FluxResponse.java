@@ -1,6 +1,9 @@
 package com.github.bluzwong.myflux.lib;
 
 import com.hwangjr.rxbus.RxBus;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +34,19 @@ public final class FluxResponse {
     }
 
     public void post() {
-        RxBus.get().post(this);
+        Observable.just(this)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<FluxResponse>() {
+                    @Override
+                    public void call(FluxResponse fluxResponse) {
+                        RxBus.get().post(fluxResponse);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                });
     }
 
     public Map<String, Object> getDataMap() {

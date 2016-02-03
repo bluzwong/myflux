@@ -1,5 +1,12 @@
 package com.github.bluzwong.myflux.lib;
 
+import rx.Observable;
+import rx.Observer;
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
 import java.util.UUID;
 
 /**
@@ -25,9 +32,42 @@ public class FluxRequester {
         void request(final String requestUUID);
     }
 
-    protected String createRequest(RequestAction action) {
-        String uuid = createUUID();
+    protected String createRequest(final RequestAction action, Scheduler scheduler) {
+        final String uuid = createUUID();
+        Observable.just(action)
+                .observeOn(scheduler)
+                .doOnNext(new Action1<RequestAction>() {
+                    @Override
+                    public void call(RequestAction requestAction) {
+                        action.request(uuid);
+                    }
+                }).subscribe();
+        return uuid;
+    }
+
+    protected String createRequest(final RequestAction action) {
+        final String uuid = createUUID();
         action.request(uuid);
         return uuid;
+    }
+
+    protected String createRequestIO(final RequestAction action) {
+        return createRequest(action, Schedulers.io());
+    }
+
+    protected String createRequestComputation(final RequestAction action) {
+        return createRequest(action, Schedulers.computation());
+    }
+
+    protected String createRequestNewThread(final RequestAction action) {
+        return createRequest(action, Schedulers.newThread());
+    }
+
+    protected String createRequestMainThread(final RequestAction action) {
+        return createRequest(action, AndroidSchedulers.mainThread());
+    }
+
+    protected String createRequestCurrent(final RequestAction action) {
+        return createRequest(action, Schedulers.immediate());
     }
 }
