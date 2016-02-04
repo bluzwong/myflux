@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+import com.github.bluzwang.myflux.example.KotlinActivity;
 import com.github.bluzwang.myflux.example.RequestType;
 import com.github.bluzwang.myflux_kotlin.R;
 import com.github.bluzwong.myflux.lib.FluxCore;

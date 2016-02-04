@@ -27,11 +27,11 @@ public class FluxRequester {
      *
      *     will post to the class registed to FluxCore and have this method:
      *
-     *             @ReceiveType(type = {"Custom Request Type"})
+     *             at ReceiveType(type = {"Custom Request Type"})
      *             public void receive(FluxResponse response) {
-     *                 String valueByKey = response.getData("key"); // valueByKey => "value"
-     *                 String type = response.getType();            // type => "Custom Request Type"
-     *                 String UUID = response.getRequestUUID();     // UUID => requestUUID
+     *                 String valueByKey = response.getData("key"); // valueByKey : "value"
+     *                 String type = response.getType();            // type : "Custom Request Type"
+     *                 String UUID = response.getRequestUUID();     // UUID : requestUUID
      *             }
      *
      * @param requestUUID the unique request id

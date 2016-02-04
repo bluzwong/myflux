@@ -82,8 +82,8 @@ public enum FluxCore {
 
     /**
      * should receive response at the receiver class by this:
-     * // annotation args => type: distinguish request type
-     * // method args  => FluxResponse response: must be the only arg, response of request
+     * // annotation args    type: distinguish request type
+     * // method args     FluxResponse response: must be the only arg, response of request
      *
      *  \@ReceiveType(type = {"Custom Request Type"})
         public void doCcf(FluxResponse response) { }

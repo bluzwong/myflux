@@ -4,6 +4,7 @@ package com.github.bluzwong.myflux.processor.annotation;
 
 import com.github.bluzwong.myflux.processor.inject.ClassInjector;
 import com.github.bluzwong.myflux.processor.inject.MethodInjector;
+import com.google.auto.service.AutoService;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -15,17 +16,13 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.Writer;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/24.
  */
-@SupportedAnnotationTypes({"com.github.bluzwong.myflux.lib.switchtype.ReceiveType"})
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
+@AutoService(Processor.class)
 public class AnnotationProcessor extends AbstractProcessor{
 
 
@@ -41,6 +38,18 @@ public class AnnotationProcessor extends AbstractProcessor{
         filer = env.getFiler();
         elementUtils = env.getElementUtils();
         typeUtils = env.getTypeUtils();
+    }
+
+
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        Set<String> types = new LinkedHashSet<>();
+        types.add("com.github.bluzwong.myflux.lib.switchtype.ReceiveType");
+        return types;
+    }
+
+    @Override public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
     }
     /**
      * {@inheritDoc}
@@ -66,6 +75,7 @@ public class AnnotationProcessor extends AbstractProcessor{
             }
         }
 */
+
         for (Map.Entry<TypeElement, ClassInjector> entry : targetClassMap.entrySet()) {
             TypeElement typeElement = entry.getKey();
             ClassInjector injector = entry.getValue();
@@ -77,6 +87,7 @@ public class AnnotationProcessor extends AbstractProcessor{
                 writer.write(value);
                 writer.flush();
                 writer.close();
+                log("finish out put~~~~~~~~~~~~~~~~~");
             } catch (Exception e) {
                 processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage(), typeElement);
             }
@@ -91,8 +102,13 @@ public class AnnotationProcessor extends AbstractProcessor{
         for (TypeElement te : annotations) {
             // te = zhujie
             String annoName = te.getSimpleName().toString();
+            log("annoName ==>  " + te.getQualifiedName());
+            if (!te.getQualifiedName().toString().equals("com.github.bluzwong.myflux.lib.switchtype.ReceiveType")) {
+                continue;
+            }
             for (Element e : roundEnv.getElementsAnnotatedWith(te)) {
-                //log("work on -> " + e.toString());
+
+                log("work on -> " + e.toString());
                 Name methodName = e.getSimpleName();
 
                 ExecutableElement executableElement = (ExecutableElement) e;

@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt' //apt
+apply plugin: 'kotlin-android'
+//apply plugin: 'com.neenbedankt.android-apt' //apt
 
 android {
     compileSdkVersion 22
@@ -18,8 +19,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 }
 repositories {
+    mavenCentral()
 //    maven {
 //        url 'https://dl.bintray.com/bluzwong/maven'
 //    }
@@ -29,12 +34,26 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:design:22.2.1'
 
-//    compile ('com.github.bluzwong:myflux-lib:1.0.2@aar') { transitive = true }
-//    apt 'com.github.bluzwong:myflux-processor:0.9.9'
-    compile project(':myflux-lib')
-    apt project(':myflux-processor')
+    compile ('com.github.bluzwong:myflux-lib:1.1.1@aar') { transitive = true }
+    kapt 'com.github.bluzwong:myflux-processor:1.1.1'
+//    compile project(':myflux-lib')
+//    kapt project(':myflux-processor')
 
     testCompile 'junit:junit:4.12'
     testCompile ('org.robolectric:robolectric:3.0-rc3') {exclude module: 'asm'}
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
+}
+buildscript {
+    ext.kotlin_version = '1.0.0-rc-1036'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+kapt {
+    generateStubs = true
 }
