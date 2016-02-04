@@ -7,11 +7,9 @@ import android.widget.Toast;
 import com.github.bluzwang.myflux.example.RequestType;
 import com.github.bluzwang.myflux_kotlin.R;
 import com.github.bluzwong.myflux.lib.FluxCore;
-import com.github.bluzwong.myflux.lib.FluxReceiver;
 import com.github.bluzwong.myflux.lib.FluxResponse;
 import com.github.bluzwong.myflux.lib.switchtype.ReceiveType;
 
-import java.util.Map;
 import java.util.UUID;
 
 public class DemoActivity extends Activity  {
@@ -34,7 +32,7 @@ public class DemoActivity extends Activity  {
         findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requester.requestSumDelay(1, 2);
+                requester.requestSumIO(1, 2);
             }
         });
     }
@@ -68,25 +66,28 @@ public class DemoActivity extends Activity  {
     void doCcf(FluxResponse response) {
         int sum = (int) response.getData("sum");
         receives[0] = sum;
-
+        Toast.makeText(this, "type = {\"1\"} sum => " + sum, Toast.LENGTH_SHORT).show();
     }
 
     @ReceiveType(type = "2")
     void doCcf2(FluxResponse response) {
         int sum = (int) response.getData("sum");
         receives[1] = sum;
+        Toast.makeText(this, "type = \"2\" sum => " + sum, Toast.LENGTH_SHORT).show();
     }
 
     @ReceiveType(type = {"1", "2"})
     void dowsd2(FluxResponse response) {
         int sum = (int) response.getData("sum");
         receives[2] = sum;
+        Toast.makeText(this, "type = {\"1\", \"2\"} sum => " + sum, Toast.LENGTH_SHORT).show();
     }
 
     @ReceiveType(type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI})
     void dowsd(FluxResponse response) {
         int sum = (int) response.getData("sum");
         receives[3] = sum;
+        Toast.makeText(this, "type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI} sum => " + sum, Toast.LENGTH_SHORT).show();
     }
 
 }

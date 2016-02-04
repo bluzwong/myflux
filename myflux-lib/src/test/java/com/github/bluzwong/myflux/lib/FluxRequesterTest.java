@@ -49,7 +49,7 @@ public class FluxRequesterTest {
             }
         });
 
-        String uuid = requester.createRequest(new FluxRequester.RequestAction() {
+        String uuid = requester.doRequest(new FluxRequester.RequestAction() {
             @Override
             public void request(String requestUUID) {
                 try {

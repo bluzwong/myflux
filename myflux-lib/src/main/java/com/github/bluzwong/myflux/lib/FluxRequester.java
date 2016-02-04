@@ -19,6 +19,24 @@ public class FluxRequester {
         this.receiverId = receiverId;
     }
 
+    /**
+     * after request done, create the response to receiver
+     * @param type the request type
+     *   example:
+     *             createResponse("Custom Request Type", requestUUID).setData("key", "value").post();
+     *
+     *     will post to the class registed to FluxCore and have this method:
+     *
+     *             @ReceiveType(type = {"Custom Request Type"})
+     *             public void receive(FluxResponse response) {
+     *                 String valueByKey = response.getData("key"); // valueByKey => "value"
+     *                 String type = response.getType();            // type => "Custom Request Type"
+     *                 String UUID = response.getRequestUUID();     // UUID => requestUUID
+     *             }
+     *
+     * @param requestUUID the unique request id
+     * @return response instance, need invoke post() to post it
+     */
     protected FluxResponse createResponse(String type, String requestUUID) {
         return FluxResponse.create(receiverId, type, requestUUID);
     }
@@ -31,7 +49,13 @@ public class FluxRequester {
         void request(final String requestUUID);
     }
 
-    protected String createRequest(Scheduler scheduler, final RequestAction action) {
+    /**
+     * do request at scheduler
+     * @param scheduler work on which thread
+     * @param action the real request
+     * @return the unique id of each request
+     */
+    protected String doRequest(Scheduler scheduler, final RequestAction action) {
         final String uuid = createUUID();
         Observable.just(action)
                 .observeOn(scheduler)
@@ -44,29 +68,29 @@ public class FluxRequester {
         return uuid;
     }
 
-    protected String createRequest(final RequestAction action) {
+    protected String doRequest(final RequestAction action) {
         final String uuid = createUUID();
         action.request(uuid);
         return uuid;
     }
 
-    protected String createRequestIO(final RequestAction action) {
-        return createRequest(Schedulers.io(), action);
+    protected String doRequestIO(final RequestAction action) {
+        return doRequest(Schedulers.io(), action);
     }
 
-    protected String createRequestComputation(final RequestAction action) {
-        return createRequest(Schedulers.computation(), action);
+    protected String doRequestComputation(final RequestAction action) {
+        return doRequest(Schedulers.computation(), action);
     }
 
-    protected String createRequestNewThread(final RequestAction action) {
-        return createRequest(Schedulers.newThread(), action);
+    protected String doRequestNewThread(final RequestAction action) {
+        return doRequest(Schedulers.newThread(), action);
     }
 
-    protected String createRequestMainThread(final RequestAction action) {
-        return createRequest(AndroidSchedulers.mainThread(), action);
+    protected String doRequestMainThread(final RequestAction action) {
+        return doRequest(AndroidSchedulers.mainThread(), action);
     }
 
-    protected String createRequestCurrent(final RequestAction action) {
-        return createRequest(Schedulers.immediate(), action);
+    protected String doRequestCurrent(final RequestAction action) {
+        return doRequest(Schedulers.immediate(), action);
     }
 }

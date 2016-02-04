@@ -86,7 +86,7 @@ public enum FluxCore {
      * // method args  => FluxResponse response: must be the only arg, response of request
      *
      *  \@ReceiveType(type = {"Custom Request Type"})
-        public void doCcf(FluxResponse response) {
+        public void doCcf(FluxResponse response) { }
 
      * @param receiverId unique receiver id
      * @param target receiver which receive response with receiverId

@@ -2,7 +2,6 @@ package com.github.bluzwang.myflux.example.demo;
 
 import com.github.bluzwong.myflux.lib.FluxRequester;
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -18,35 +17,43 @@ public class DemoRequester extends FluxRequester {
         super(receiverId);
     }
 
-    public String requestSum(final int a, final int b) {
-        return createRequest(new RequestAction() {
-            @Override
-            public void request(final String requestUUID) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                createResponse("1", requestUUID).setData("sum", a + b).post();
-            }
-        });
+    private int slowAdd(int a, int b, int delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return a + b;
     }
-    public String requestSum2(final int a, final int b) {
-        return createRequest(new RequestAction() {
+
+    private int slowAdd(int a, int b) {
+        return slowAdd(a, b, 100);
+    }
+
+    private int bigSlowAdd(int a, int b) {
+        return slowAdd(a, b, 2000);
+    }
+
+    /**
+     * request work on the current thread, may block main thread if the current is;
+     */
+    public String requestSum(final int a, final int b) {
+        return doRequest(new RequestAction() {
             @Override
             public void request(final String requestUUID) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                createResponse("2", requestUUID).setData("sum", a + b).post();
+                /// will block main thread
+                int sum = slowAdd(a, b);
+                createResponse("1", requestUUID).setData("sum", sum).post();
             }
         });
     }
 
-    public String requestSum3(final int a, final int b) {
-        return createRequest(new RequestAction() {
+
+    /**
+     * request work on the current thread, use rxjava to do request
+     */
+    public String requestSum2(final int a, final int b) {
+        return doRequest(new RequestAction() {
             @Override
             public void request(final String requestUUID) {
                 Observable.just(requestUUID)
@@ -61,7 +68,8 @@ public class DemoRequester extends FluxRequester {
                                 }
                                 return a+b;
                             }
-                        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() {
+                        })
+                        .subscribe(new Action1<Integer>() {
                     @Override
                     public void call(Integer integer) {
                         createResponse("1", requestUUID).setData("sum", integer).post();
@@ -71,17 +79,30 @@ public class DemoRequester extends FluxRequester {
         });
     }
 
-    public String requestSumDelay(final int a, final int b) {
-        return createRequestIO(new RequestAction() {
+    /**
+     * io request work on IO thread, not block main thread
+     */
+    public String requestSumIO(final int a, final int b) {
+        return doRequestIO(new RequestAction() {
             @Override
             public void request(final String requestUUID) {
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                createResponse("2", requestUUID).setData("sum", a + b).post();
+                int sum = bigSlowAdd(a, b);
+                createResponse("2", requestUUID).setData("sum", sum).post();
             }
         });
     }
+
+    /**
+     * heavy request work on Computation thread, not block main thread
+     */
+    public String requestSumComputation(final int a, final int b) {
+        return doRequestComputation(new RequestAction() {
+            @Override
+            public void request(final String requestUUID) {
+                int sum = slowAdd(a, b);
+                createResponse("1", requestUUID).setData("sum", sum).post();
+            }
+        });
+    }
+
 }
