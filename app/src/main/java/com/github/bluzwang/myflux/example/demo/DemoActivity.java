@@ -27,8 +27,14 @@ public class DemoActivity extends Activity  {
             }
         }
         setContentView(R.layout.activity_flux);
+
+        // 请求的实际运行对象，需要绑定接受响应对象的id
         requester = new DemoRequester(receiverUUID);
+        // 注册接受响应的id，指定接受到响应的类
         FluxCore.INSTANCE.register(receiverUUID, this);
+
+        // 点击发出请求
+        // 该请求将会发出一个type = "2" 的响应
         findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -37,57 +43,38 @@ public class DemoActivity extends Activity  {
         });
     }
 
+    // 注册后 将会在接收到 type = "1" 的响应时运行在主线程
+    @ReceiveType(type = {"1"})
+    void doCcf(FluxResponse response) {
+        int sum = (int) response.getData("sum");
+        Toast.makeText(this, "type = {\"1\"} sum => " + sum, Toast.LENGTH_SHORT).show();
+    }
+
+    // 注册后 将会在接收到 type = "2" 的响应时运行在主线程
+    @ReceiveType(type = "2")
+    void doCcf2(FluxResponse response) {
+        int sum = (int) response.getData("sum");
+        Toast.makeText(this, "type = \"2\" sum => " + sum, Toast.LENGTH_SHORT).show();
+    }
+
+    // 注册后 将会在接收到 type = "2" 或者type = "2" 的响应时运行在主线程
+    @ReceiveType(type = {"1", "2"})
+    void dowsd2(FluxResponse response) {
+        int sum = (int) response.getData("sum");
+        Toast.makeText(this, "type = {\"1\", \"2\"} sum => " + sum, Toast.LENGTH_SHORT).show();
+    }
+
+    // 注册后 将会在接收到 type = RequestType.REQUEST_1 或者type = RequestType.REQUEST_2 的响应时运行在主线程
+    @ReceiveType(type = {RequestType.REQUEST_1, RequestType.RESTORE_2})
+    void dowsd(FluxResponse response) {
+        int sum = (int) response.getData("sum");
+        Toast.makeText(this, "type = {RequestType.REQUEST_1, RequestType.RESTORE_2} sum => " + sum, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("uuid", receiverUUID);
         super.onSaveInstanceState(outState);
-    }
-
-    //@Override
-    public void onReceive(FluxResponse response) {
-        // 使用apt解析注解
-//        FluxCore.switchReceiveTypeApt(this, dataMap, type);
-        // 使用反射解析注解 效率没有apt高
-//        FluxCore.switchReceiveTypeReflect(this, dataMap, type);
-
-        // 优先使用apt apt不可用时 使用反射
-        FluxCore.switchReceiveType(this, response);
-    }
-
-    int[] receives = {0, 0, 0, 0};
-
-    public void clearReceives() {
-        for (int i = 0; i < receives.length; i++) {
-            receives[i] = 0;
-        }
-    }
-
-    @ReceiveType(type = {"1"})
-    void doCcf(FluxResponse response) {
-        int sum = (int) response.getData("sum");
-        receives[0] = sum;
-        Toast.makeText(this, "type = {\"1\"} sum => " + sum, Toast.LENGTH_SHORT).show();
-    }
-
-    @ReceiveType(type = "2")
-    void doCcf2(FluxResponse response) {
-        int sum = (int) response.getData("sum");
-        receives[1] = sum;
-        Toast.makeText(this, "type = \"2\" sum => " + sum, Toast.LENGTH_SHORT).show();
-    }
-
-    @ReceiveType(type = {"1", "2"})
-    void dowsd2(FluxResponse response) {
-        int sum = (int) response.getData("sum");
-        receives[2] = sum;
-        Toast.makeText(this, "type = {\"1\", \"2\"} sum => " + sum, Toast.LENGTH_SHORT).show();
-    }
-
-    @ReceiveType(type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI})
-    void dowsd(FluxResponse response) {
-        int sum = (int) response.getData("sum");
-        receives[3] = sum;
-        Toast.makeText(this, "type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI} sum => " + sum, Toast.LENGTH_SHORT).show();
     }
 
 }

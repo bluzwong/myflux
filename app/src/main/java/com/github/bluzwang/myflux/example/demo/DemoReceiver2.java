@@ -51,7 +51,7 @@ public class DemoReceiver2 implements FluxReceiver {
         receives[2] = sum;
     }
 
-    @ReceiveType(type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI})
+    @ReceiveType(type = {RequestType.REQUEST_1, RequestType.RESTORE_2})
     void dowsd(FluxResponse response) {
         int sum = (int) response.getData("sum");
         receives[3] = sum;
