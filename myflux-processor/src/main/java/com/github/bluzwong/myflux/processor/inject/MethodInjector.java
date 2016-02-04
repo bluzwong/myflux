@@ -11,9 +11,8 @@ public class MethodInjector {
     boolean isTwoArguments = false;
     List<String> types = new ArrayList<String>();
 
-    public MethodInjector(String methodName, boolean isTwoArguments) {
+    public MethodInjector(String methodName) {
         this.methodName = methodName;
-        this.isTwoArguments = isTwoArguments;
     }
 
     public void addType(String type) {
@@ -28,10 +27,6 @@ public class MethodInjector {
             return "";
 
         }
-        if (isTwoArguments) {
-            return "receiver." + methodName + "(dataMap, type);\n";
-        } else {
-            return "receiver." + methodName + "(dataMap);\n";
-        }
+        return "receiver." + methodName + "(fluxResponse);\n";
     }
 }

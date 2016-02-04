@@ -39,11 +39,14 @@ public class ClassInjector {
         StringBuilder builder = new StringBuilder();
         builder.append("package ").append(classPackage).append(";\n");
         builder.append("import com.github.bluzwong.myflux.lib.switchtype.ReceiveTypeDispatcher;\n");
+        builder.append("import com.github.bluzwong.myflux.lib.FluxResponse;\n");
         builder.append("import java.util.Map;\n");
         builder.append("public class ").append(className).append(" implements ReceiveTypeDispatcher {\n");
         builder.append("@Override\n");
-        builder.append("public void dispatchType(Object target, Map<String, Object> dataMap, String type) {\n");
+        builder.append("public void dispatchType(Object target, FluxResponse fluxResponse) {\n");
         builder.append(originClassName).append(" receiver = (").append(originClassName).append(") target;\n");
+        builder.append("String type = fluxResponse.getType();\n");
+        builder.append("Map<String, Object> dataMap = fluxResponse.getDataMap();\n");
         builder.append("switch(type) {\n");
 
         for (String type : types) {

@@ -2,8 +2,6 @@ package com.github.bluzwong.myflux.lib;
 
 import com.github.bluzwong.myflux.lib.switchtype.ReceiveType;
 import com.hwangjr.rxbus.RxBus;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
@@ -42,7 +40,7 @@ public class FluxCoreTest {
 
         FluxReceiver receiver = new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
 
             }
         };
@@ -58,7 +56,7 @@ public class FluxCoreTest {
 
         FluxReceiver receiver = new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
 
             }
         };
@@ -71,7 +69,7 @@ public class FluxCoreTest {
 
         FluxCore.INSTANCE.unregister("ccf", new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
 
             }
         });
@@ -80,23 +78,58 @@ public class FluxCoreTest {
         assertEquals(maps.get("ccf"), null);
     }
 
+     class TestObject {
+        @ReceiveType(type = "testDynamic")
+        public void receiveWsd(FluxResponse response) {
+            assertEquals(response.getReceiverId(), "aaa");
+            assertEquals(response.getType(), "testDynamic");
+            assertEquals(response.getRequestUUID(), "ccc");
+            latch.countDown();
+        }
+    }
+
+    @Test
+    public void testRegister2() throws Exception {
+        Map<String, FluxReceiver> maps = FluxCore.INSTANCE.receiverMaps;
+        maps.clear();
+        TestObject object = new TestObject();
+        FluxCore.INSTANCE.register("ccf", object);
+        FluxReceiver receiverProxy = maps.get("ccf");
+        assertNotNull(receiverProxy);
+        assertNotEquals(object, receiverProxy);
+        latch = new CountDownLatch(1);
+        receiverProxy.onReceive(FluxResponse.create("aaa", "testDynamic", "ccc"),null);
+        assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void testUnregister2() throws Exception {
+        Map<String, FluxReceiver> maps = FluxCore.INSTANCE.receiverMaps;
+        maps.clear();
+        TestObject object = new TestObject();
+        FluxCore.INSTANCE.register("ccf", object);
+        FluxReceiver receiverProxy = maps.get("ccf");
+        assertNotNull(receiverProxy);
+        assertNotEquals(object, receiverProxy);
+
+        FluxCore.INSTANCE.unregister("ccf", object);
+        assertEquals(maps.get("ccf"), null);
+    }
+
     @Test
     public void testOnReceiveResponse() throws Exception {
         final CountDownLatch latch = new CountDownLatch(1);
         FluxCore.INSTANCE.register("ccf", new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
-                assertEquals(type, "ccf-type");
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+                assertEquals(response.getType(), "ccf-type");
                 assertEquals(dataMap.get("ccf-key"), "ccf-data");
                 assertEquals("main", Thread.currentThread().getName());
                 latch.countDown();
             }
         });
         FluxResponse.create("ccf", "ccf-type", "ccf-uuid").setData("ccf-key", "ccf-data").post();
-        long startTime = System.currentTimeMillis();
-        latch.await(200, TimeUnit.MILLISECONDS);
-        long endTime = System.currentTimeMillis();
-        assertTrue(endTime - startTime < 200);
+        assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
     }
 
     CountDownLatch latch;
@@ -105,8 +138,8 @@ public class FluxCoreTest {
         latch = new CountDownLatch(2);
         FluxCore.INSTANCE.register("ccf-id", new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
-                FluxCore.switchReceiveTypeReflect(FluxCoreTest.this, dataMap, type);
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+                FluxCore.switchReceiveTypeReflect(FluxCoreTest.this, response);
             }
         });
 
@@ -119,14 +152,14 @@ public class FluxCoreTest {
     }
 
     @ReceiveType(type = "wsd")
-    public void receiveTest(Map<String, Object> maps, String type) {
-        assertEquals(maps.get("key"), "value");
+    public void receiveTest(FluxResponse response) {
+        assertEquals(response.getData("key"), "value");
         latch.countDown();
     }
 
     @ReceiveType(type = "wsd")
-    public void receiveTest(Map<String, Object> maps) {
-        assertEquals(maps.get("key"), "value");
+    public void receiveTest2(FluxResponse response) {
+        assertEquals(response.getData("key"), "value");
         latch.countDown();
     }
 

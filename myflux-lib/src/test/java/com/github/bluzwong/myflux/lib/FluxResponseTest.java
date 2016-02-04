@@ -51,8 +51,8 @@ public class FluxResponseTest {
         final CountDownLatch latch = new CountDownLatch(1);
         FluxCore.INSTANCE.register("ccf", new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
-                assertEquals(type, "ccf-type");
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+                assertEquals(response.getType(), "ccf-type");
                 assertEquals(dataMap.get("ccf-key"), "ccf-data");
                 assertEquals("main", Thread.currentThread().getName());
                 latch.countDown();
@@ -70,7 +70,7 @@ public class FluxResponseTest {
         final CountDownLatch latch = new CountDownLatch(1);
         FluxCore.INSTANCE.register("ccf", new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
                 latch.countDown();
             }
         });
@@ -86,7 +86,7 @@ public class FluxResponseTest {
         final CountDownLatch latch = new CountDownLatch(1);
         FluxReceiver receiver = new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
                 latch.countDown();
             }
         };
@@ -106,14 +106,14 @@ public class FluxResponseTest {
         final CountDownLatch latch = new CountDownLatch(1);
         FluxReceiver receiver = new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
                 assertTrue(false);
             }
         };
         FluxCore.INSTANCE.register("ccf", receiver);
         FluxCore.INSTANCE.register("ccf", new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
                 latch.countDown();
             }
         });

@@ -3,6 +3,7 @@ package com.github.bluzwang.myflux.example.demo;
 import com.github.bluzwang.myflux.example.RequestType;
 import com.github.bluzwong.myflux.lib.FluxCore;
 import com.github.bluzwong.myflux.lib.FluxReceiver;
+import com.github.bluzwong.myflux.lib.FluxResponse;
 import com.github.bluzwong.myflux.lib.switchtype.ReceiveType;
 
 import java.util.Map;
@@ -20,8 +21,8 @@ public class DemoReceiver2 implements FluxReceiver {
 
 
     @Override
-    public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
-        FluxCore.switchReceiveTypeReflect(this, dataMap, type);
+    public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+        FluxCore.switchReceiveTypeReflect(this, response);
     }
 
     int[] receives = {0, 0, 0, 0};
@@ -33,27 +34,27 @@ public class DemoReceiver2 implements FluxReceiver {
     }
 
     @ReceiveType(type = {"1"})
-    void doCcf(Map<String, Object> dataMap) {
-        int sum = (int) dataMap.get("sum");
+    void doCcf(FluxResponse response) {
+        int sum = (int) response.getData("sum");
         receives[0] = sum;
 
     }
 
     @ReceiveType(type = "2")
-    void doCcf(Map<String, Object> dataMap, String type) {
-        int sum = (int) dataMap.get("sum");
+    void doCcf2(FluxResponse response) {
+        int sum = (int) response.getData("sum");
         receives[1] = sum;
     }
 
     @ReceiveType(type = {"1", "2"})
-    void dowsd(Map<String, Object> dataMap, String type) {
-        int sum = (int) dataMap.get("sum");
+    void dowsd2(FluxResponse response) {
+        int sum = (int) response.getData("sum");
         receives[2] = sum;
     }
 
     @ReceiveType(type = {RequestType.REQUEST_ADD, RequestType.RESTORE_UI})
-    void dowsd(Map<String, Object> dataMap) {
-        int sum = (int) dataMap.get("sum");
+    void dowsd(FluxResponse response) {
+        int sum = (int) response.getData("sum");
         receives[3] = sum;
     }
 

@@ -3,11 +3,14 @@ package com.github.bluzwong.myflux.lib;
 import com.github.bluzwong.myflux.lib.switchtype.DispatcherFactory;
 import com.github.bluzwong.myflux.lib.switchtype.ReceiveType;
 import com.github.bluzwong.myflux.lib.switchtype.ReceiveTypeDispatcher;
+import com.github.bluzwong.myflux.lib.switchtype.TargetHolder;
 import com.hwangjr.rxbus.RxBus;
 import com.hwangjr.rxbus.annotation.Subscribe;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,6 +60,66 @@ public enum FluxCore {
         }
     }
 
+    static class FluxInvocationHandler implements InvocationHandler {
+
+        private Object target;
+
+        public FluxInvocationHandler(Object target) {
+            this.target = target;
+        }
+
+        @Override
+        public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
+            String methodName = method.getName();
+            if (methodName.equals("onReceive") && objects.length == 2) {
+                switchReceiveType(target, ((FluxResponse) objects[0]));
+            } else if (methodName.equals("getTarget")) {
+                return target;
+            }
+            return null;
+        }
+    }
+
+    /**
+     * should receive response at the receiver class by this:
+     * // annotation args => type: distinguish request type
+     * // method args  => FluxResponse response: must be the only arg, response of request
+     *
+     *  \@ReceiveType(type = {"Custom Request Type"})
+        public void doCcf(FluxResponse response) {
+
+     * @param receiverId unique receiver id
+     * @param target receiver which receive response with receiverId
+     */
+    public void register(String receiverId, final Object target) {
+        FluxReceiver instance = (FluxReceiver) Proxy.newProxyInstance(FluxReceiver.class.getClassLoader(), new Class[]{FluxReceiver.class, TargetHolder.class}, new FluxInvocationHandler(target));
+        register(receiverId, instance);
+    }
+
+    public void unregister(String receiverId, Object target) {
+        if (target == null) {
+            return;
+        }
+        if (!receiverMaps.containsKey(receiverId)) {
+            return;
+        }
+
+        Object targetById = receiverMaps.get(receiverId);
+        if (targetById == null) {
+            receiverMaps.remove(receiverId);
+            return;
+        }
+
+        if (targetById instanceof TargetHolder) {
+            Object realTarget = ((TargetHolder) targetById).getTarget(); // maybe activity
+            if (realTarget == target) {
+                // targetById is the fluxrespose proxy of target, should be removed
+                receiverMaps.remove(receiverId);
+            }
+        }
+    }
+
+
     @Subscribe
     public void onReceiveResponse(FluxResponse fluxResponse) {
         if (!receiverMaps.containsKey(fluxResponse.getReceiverId())) {
@@ -68,27 +131,27 @@ public enum FluxCore {
             return;
         }
 
-        receiver.onReceive(fluxResponse.getDataMap(), fluxResponse.getType(), fluxResponse.getRequestUUID());
+        receiver.onReceive(fluxResponse, fluxResponse.getDataMap());
     }
 
-    public static void switchReceiveType(Object target, Map<String, Object> dataMap, String type) {
+    public static void switchReceiveType(Object target, FluxResponse response) {
         ReceiveTypeDispatcher dispatcher = DispatcherFactory.create(target);
         if (dispatcher == null) {
-            switchReceiveTypeReflect(target, dataMap, type);
+            switchReceiveTypeReflect(target, response);
             return;
         }
-        dispatcher.dispatchType(target, dataMap, type);
+        dispatcher.dispatchType(target, response);
     }
 
-    public static void switchReceiveTypeApt(Object target, Map<String, Object> dataMap, String type) {
+    public static void switchReceiveTypeApt(Object target, FluxResponse response) {
         ReceiveTypeDispatcher dispatcher = DispatcherFactory.create(target);
         if (dispatcher == null) {
             return;
         }
-        dispatcher.dispatchType(target, dataMap, type);
+        dispatcher.dispatchType(target, response);
     }
 
-    public static void switchReceiveTypeReflect(Object target, Map<String, Object> dataMap, String type) {
+    public static void switchReceiveTypeReflect(Object target, FluxResponse response) {
         for (Method method : target.getClass().getDeclaredMethods()) {
             ReceiveType annotation = method.getAnnotation(ReceiveType.class);
             if (annotation == null) {
@@ -97,7 +160,7 @@ public enum FluxCore {
             String[] types = annotation.type();
             boolean needReceive = false;
             for (String t : types) {
-                if (t.equals(type)) {
+                if (t.equals(response.getType())) {
                     needReceive = true;
                     break;
                 }
@@ -109,24 +172,18 @@ public enum FluxCore {
             Class<?>[] parameterTypes = method.getParameterTypes();
 
             int paramsLength = parameterTypes.length;
-            if (paramsLength != 2 && paramsLength != 1) {
+            if (paramsLength != 1) {
                 continue;
             }
 
-            if (parameterTypes[0] != Map.class) {
+            if (parameterTypes[0] != FluxResponse.class) {
                 continue;
             }
-            if (paramsLength == 2 && parameterTypes[1] != String.class) {
-                continue;
-            }
+
 
             method.setAccessible(true);
             try {
-                if (paramsLength == 2) {
-                    method.invoke(target, dataMap, type);
-                } else {
-                    method.invoke(target, dataMap);
-                }
+                method.invoke(target, response);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {

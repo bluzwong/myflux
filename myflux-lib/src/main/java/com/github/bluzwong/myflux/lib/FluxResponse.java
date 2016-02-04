@@ -53,6 +53,10 @@ public final class FluxResponse {
         return dataMap;
     }
 
+    public Object getData(String key) {
+        return dataMap.get(key);
+    }
+
 
     public String getType() {
         return type;

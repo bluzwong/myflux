@@ -40,12 +40,12 @@ public class FluxRequesterTest {
         final CountDownLatch latch = new CountDownLatch(1);
         FluxCore.INSTANCE.register("id", new FluxReceiver() {
             @Override
-            public void onReceive(Map<String, Object> dataMap, String type, String requestUUID) {
-                assertNotNull(requestUUID);
-                assertNotEquals(requestUUID, "");
-                assertEquals(type, "typeccf");
+            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+                assertNotNull(response.getRequestUUID());
+                assertNotEquals(response.getRequestUUID(), "");
+                assertEquals(response.getType(), "typeccf");
                 assertEquals(dataMap.get("key"), "ccf");
-                requestUUID1[1] = requestUUID;
+                requestUUID1[1] = response.getRequestUUID();
                 latch.countDown();
             }
         });
