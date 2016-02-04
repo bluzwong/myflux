@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -40,11 +39,11 @@ public class FluxRequesterTest {
         final CountDownLatch latch = new CountDownLatch(1);
         FluxCore.INSTANCE.register("id", new FluxReceiver() {
             @Override
-            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+            public void onReceive(FluxResponse response) {
                 assertNotNull(response.getRequestUUID());
                 assertNotEquals(response.getRequestUUID(), "");
                 assertEquals(response.getType(), "typeccf");
-                assertEquals(dataMap.get("key"), "ccf");
+                assertEquals(response.getData("key"), "ccf");
                 requestUUID1[1] = response.getRequestUUID();
                 latch.countDown();
             }

@@ -6,7 +6,6 @@ import com.github.bluzwong.myflux.lib.FluxReceiver;
 import com.github.bluzwong.myflux.lib.FluxResponse;
 import com.github.bluzwong.myflux.lib.switchtype.ReceiveType;
 
-import java.util.Map;
 import java.util.UUID;
 
 public class DemoReceiver2 implements FluxReceiver {
@@ -21,7 +20,7 @@ public class DemoReceiver2 implements FluxReceiver {
 
 
     @Override
-    public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+    public void onReceive(FluxResponse response) {
         FluxCore.switchReceiveTypeReflect(this, response);
     }
 

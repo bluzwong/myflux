@@ -71,7 +71,7 @@ public enum FluxCore {
         @Override
         public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
             String methodName = method.getName();
-            if (methodName.equals("onReceive") && objects.length == 2) {
+            if (methodName.equals("onReceive") && objects.length == 1) {
                 switchReceiveType(target, ((FluxResponse) objects[0]));
             } else if (methodName.equals("getTarget")) {
                 return target;
@@ -131,7 +131,7 @@ public enum FluxCore {
             return;
         }
 
-        receiver.onReceive(fluxResponse, fluxResponse.getDataMap());
+        receiver.onReceive(fluxResponse);
     }
 
     public static void switchReceiveType(Object target, FluxResponse response) {

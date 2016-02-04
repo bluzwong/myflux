@@ -46,7 +46,7 @@ public class DemoActivity extends Activity  {
     }
 
     //@Override
-    public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+    public void onReceive(FluxResponse response) {
         // 使用apt解析注解
 //        FluxCore.switchReceiveTypeApt(this, dataMap, type);
         // 使用反射解析注解 效率没有apt高

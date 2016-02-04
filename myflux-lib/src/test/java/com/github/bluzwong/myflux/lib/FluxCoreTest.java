@@ -40,7 +40,7 @@ public class FluxCoreTest {
 
         FluxReceiver receiver = new FluxReceiver() {
             @Override
-            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+            public void onReceive(FluxResponse response) {
 
             }
         };
@@ -56,7 +56,7 @@ public class FluxCoreTest {
 
         FluxReceiver receiver = new FluxReceiver() {
             @Override
-            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+            public void onReceive(FluxResponse response) {
 
             }
         };
@@ -69,7 +69,7 @@ public class FluxCoreTest {
 
         FluxCore.INSTANCE.unregister("ccf", new FluxReceiver() {
             @Override
-            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+            public void onReceive(FluxResponse response) {
 
             }
         });
@@ -98,7 +98,7 @@ public class FluxCoreTest {
         assertNotNull(receiverProxy);
         assertNotEquals(object, receiverProxy);
         latch = new CountDownLatch(1);
-        receiverProxy.onReceive(FluxResponse.create("aaa", "testDynamic", "ccc"),null);
+        receiverProxy.onReceive(FluxResponse.create("aaa", "testDynamic", "ccc"));
         assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
     }
 
@@ -121,9 +121,9 @@ public class FluxCoreTest {
         final CountDownLatch latch = new CountDownLatch(1);
         FluxCore.INSTANCE.register("ccf", new FluxReceiver() {
             @Override
-            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+            public void onReceive(FluxResponse response) {
                 assertEquals(response.getType(), "ccf-type");
-                assertEquals(dataMap.get("ccf-key"), "ccf-data");
+                assertEquals(response.getData("ccf-key"), "ccf-data");
                 assertEquals("main", Thread.currentThread().getName());
                 latch.countDown();
             }
@@ -138,7 +138,7 @@ public class FluxCoreTest {
         latch = new CountDownLatch(2);
         FluxCore.INSTANCE.register("ccf-id", new FluxReceiver() {
             @Override
-            public void onReceive(FluxResponse response, Map<String, Object> dataMap) {
+            public void onReceive(FluxResponse response) {
                 FluxCore.switchReceiveTypeReflect(FluxCoreTest.this, response);
             }
         });
