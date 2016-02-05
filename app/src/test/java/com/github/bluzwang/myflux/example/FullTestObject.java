@@ -1,7 +1,7 @@
 package com.github.bluzwang.myflux.example;
 
 import com.github.bluzwang.myflux.example.demo.FullReceiverObject;
-import com.github.bluzwong.myflux.lib.BuildConfig;
+import com.github.bluzwang.myflux_kotlin.BuildConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

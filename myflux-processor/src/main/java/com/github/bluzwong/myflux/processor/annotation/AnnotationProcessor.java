@@ -29,7 +29,7 @@ public class AnnotationProcessor extends AbstractProcessor{
     private Filer filer;
     private Elements elementUtils;
     private Types typeUtils;
-    private boolean LOG_OFF = false;
+    private boolean LOG_OFF = true;
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
@@ -87,7 +87,7 @@ public class AnnotationProcessor extends AbstractProcessor{
                 writer.write(value);
                 writer.flush();
                 writer.close();
-                log("finish out put~~~~~~~~~~~~~~~~~");
+                //log("finish out put~~~~~~~~~~~~~~~~~");
             } catch (Exception e) {
                 processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage(), typeElement);
             }
@@ -103,7 +103,7 @@ public class AnnotationProcessor extends AbstractProcessor{
             // te = zhujie
             String annoName = te.getSimpleName().toString();
             log("annoName ==>  " + te.getQualifiedName());
-            if (!te.getQualifiedName().toString().equals("com.github.bluzwong.myflux.lib.switchtype.ReceiveType")) {
+            if (!getSupportedAnnotationTypes().contains(te.getQualifiedName().toString())) {
                 continue;
             }
             for (Element e : roundEnv.getElementsAnnotatedWith(te)) {
