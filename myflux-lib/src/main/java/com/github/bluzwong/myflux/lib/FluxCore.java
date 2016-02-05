@@ -132,12 +132,13 @@ public enum FluxCore {
             return;
         }
         WeakReference<FluxReceiver> receiverHolder = receiverMaps.get(receiverId);
-        FluxReceiver receiver = receiverHolder.get();
-        if (receiver == null) {
+
+        if (receiverHolder == null || receiverHolder.get() == null) {
             receiverMaps.remove(receiverId);
             return;
         }
 
+        FluxReceiver receiver = receiverHolder.get();
         receiver.onReceive(fluxResponse);
     }
 
