@@ -24,6 +24,9 @@ android {
     }
 }
 repositories {
+    jcenter {
+        url 'http://jcenter.bintray.com'
+    }
     mavenCentral()
 //    maven {
 //        url 'https://dl.bintray.com/bluzwong/maven'
@@ -34,19 +37,23 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:design:22.2.1'
 
-    compile ('com.github.bluzwong:myflux-lib:1.1.1@aar') { transitive = true }
-    kapt 'com.github.bluzwong:myflux-processor:1.1.1'
-//    compile project(':myflux-lib')
-//    kapt project(':myflux-processor')
-
+//    compile ('com.github.bluzwong:myflux-lib:1.1.1@aar') { transitive = true }
+//    kapt 'com.github.bluzwong:myflux-processor:1.1.1'
+//    kaptTest 'com.github.bluzwong:myflux-processor:1.1.1'
+    compile project(':myflux-lib')
+    kapt project(':myflux-processor')
+    kaptTest project (':myflux-processor')
     testCompile 'junit:junit:4.12'
-    testCompile ('org.robolectric:robolectric:3.0-rc3') {exclude module: 'asm'}
+    testCompile ('org.robolectric:robolectric:3.0-rc3')
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
 }
 buildscript {
     ext.kotlin_version = '1.0.0-rc-1036'
     repositories {
+        jcenter {
+            url 'http://jcenter.bintray.com'
+        }
         mavenCentral()
     }
     dependencies {

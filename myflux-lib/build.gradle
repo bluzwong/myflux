@@ -27,14 +27,18 @@ dependencies {
     testCompile ('org.robolectric:robolectric:3.0-rc3')
 }
 buildscript {
-    repositories {
+    repositories {jcenter {
+        url 'http://jcenter.bintray.com'
+    }
         mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
     }
 }
-repositories {
+repositories {jcenter {
+    url 'http://jcenter.bintray.com'
+}
     mavenCentral()
 }
 //apply from: '../push.gradle'

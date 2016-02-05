@@ -1,7 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    repositories {
+    repositories {jcenter {
+        url 'http://jcenter.bintray.com'
+    }
         jcenter()
         mavenCentral()
     }
@@ -17,7 +19,9 @@ buildscript {
 }
 
 allprojects {
-    repositories {
+    repositories {jcenter {
+        url 'http://jcenter.bintray.com'
+    }
         jcenter()
         mavenCentral()
     }

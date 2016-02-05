@@ -1,5 +1,6 @@
 package com.github.bluzwang.myflux.example.demo;
 
+import com.github.bluzwang.myflux.example.DemoRequester;
 import com.github.bluzwang.myflux.example.RequestType;
 import com.github.bluzwong.myflux.lib.FluxCore;
 import com.github.bluzwong.myflux.lib.FluxReceiver;
@@ -8,12 +9,12 @@ import com.github.bluzwong.myflux.lib.switchtype.ReceiveType;
 
 import java.util.UUID;
 
-public class DemoReceiver2 implements FluxReceiver {
+public class FullReceiverInterface implements FluxReceiver {
 
     String receiverUUID = UUID.randomUUID().toString();
-    DemoRequester requester;
+    public DemoRequester requester;
 
-    public DemoReceiver2() {
+    public FullReceiverInterface() {
         requester = new DemoRequester(receiverUUID);
         FluxCore.INSTANCE.register(receiverUUID, this);
     }
@@ -24,7 +25,7 @@ public class DemoReceiver2 implements FluxReceiver {
         FluxCore.switchReceiveTypeReflect(this, response);
     }
 
-    int[] receives = {0, 0, 0, 0};
+    public int[] receives = {0, 0, 0, 0};
 
     public void clearReceives() {
         for (int i = 0; i < receives.length; i++) {
@@ -51,7 +52,7 @@ public class DemoReceiver2 implements FluxReceiver {
         receives[2] = sum;
     }
 
-    @ReceiveType(type = {RequestType.REQUEST_1, RequestType.RESTORE_2})
+    @ReceiveType(type = {RequestType.REQUEST_1, RequestType.REQUEST_2})
     void dowsd(FluxResponse response) {
         int sum = (int) response.getData("sum");
         receives[3] = sum;

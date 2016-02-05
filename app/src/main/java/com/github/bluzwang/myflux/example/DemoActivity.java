@@ -1,11 +1,9 @@
-package com.github.bluzwang.myflux.example.demo;
+package com.github.bluzwang.myflux.example;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
-import com.github.bluzwang.myflux.example.KotlinActivity;
-import com.github.bluzwang.myflux.example.RequestType;
 import com.github.bluzwang.myflux_kotlin.R;
 import com.github.bluzwong.myflux.lib.FluxCore;
 import com.github.bluzwong.myflux.lib.FluxResponse;
@@ -66,10 +64,10 @@ public class DemoActivity extends Activity  {
     }
 
     // 注册后 将会在接收到 type = RequestType.REQUEST_1 或者type = RequestType.REQUEST_2 的响应时运行在主线程
-    @ReceiveType(type = {RequestType.REQUEST_1, RequestType.RESTORE_2})
+    @ReceiveType(type = {RequestType.REQUEST_1, RequestType.REQUEST_2})
     void dowsd(FluxResponse response) {
         int sum = (int) response.getData("sum");
-        Toast.makeText(this, "type = {RequestType.REQUEST_1, RequestType.RESTORE_2} sum => " + sum, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "type = {RequestType.REQUEST_1, RequestType.REQUEST_2} sum => " + sum, Toast.LENGTH_SHORT).show();
     }
 
     @Override

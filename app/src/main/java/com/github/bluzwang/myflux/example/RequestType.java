@@ -9,5 +9,5 @@ package com.github.bluzwang.myflux.example;
  */
 public interface RequestType {
     String REQUEST_1 = "1";
-    String RESTORE_2 = "2";
+    String REQUEST_2 = "2";
 }

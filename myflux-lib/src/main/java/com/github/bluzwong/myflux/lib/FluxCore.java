@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Created by bluzwong on 2016/2/3.
@@ -32,7 +33,7 @@ public enum FluxCore {
         init();
     }
 
-    final Map<String, FluxReceiver> receiverMaps = new HashMap<String, FluxReceiver>();
+    final Map<String, FluxReceiver> receiverMaps = new WeakHashMap<>();
 
     public void register(String receiverId,FluxReceiver receiver) {
         receiverMaps.put(receiverId, receiver);

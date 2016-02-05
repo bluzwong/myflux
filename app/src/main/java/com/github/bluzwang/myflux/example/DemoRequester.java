@@ -1,4 +1,4 @@
-package com.github.bluzwang.myflux.example.demo;
+package com.github.bluzwang.myflux.example;
 
 import com.github.bluzwong.myflux.lib.FluxRequester;
 import rx.Observable;

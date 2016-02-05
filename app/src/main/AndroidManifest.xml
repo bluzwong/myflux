@@ -13,7 +13,7 @@
             android:theme="@style/AppTheme.NoActionBar" >
 
         </activity>
-        <activity android:name="com.github.bluzwang.myflux.example.demo.DemoActivity">
+        <activity android:name="com.github.bluzwang.myflux.example.DemoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

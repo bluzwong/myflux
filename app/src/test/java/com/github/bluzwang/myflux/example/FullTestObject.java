@@ -1,5 +1,6 @@
-package com.github.bluzwang.myflux.example.demo;
+package com.github.bluzwang.myflux.example;
 
+import com.github.bluzwang.myflux.example.demo.FullReceiverObject;
 import com.github.bluzwong.myflux.lib.BuildConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,12 +13,12 @@ import static org.junit.Assert.*;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class)
-public class DemoTest {
+public class FullTestObject {
 
-    DemoReceiver receiver;
+    FullReceiverObject receiver;
     @Before
     public void setUp() throws Exception {
-        receiver = new DemoReceiver();
+        receiver = new FullReceiverObject();
     }
 
     @Test
