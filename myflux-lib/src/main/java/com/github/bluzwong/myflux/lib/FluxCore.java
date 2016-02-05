@@ -7,6 +7,7 @@ import com.github.bluzwong.myflux.lib.switchtype.TargetHolder;
 import com.hwangjr.rxbus.RxBus;
 import com.hwangjr.rxbus.annotation.Subscribe;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -14,6 +15,7 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by bluzwong on 2016/2/3.
@@ -33,10 +35,10 @@ public enum FluxCore {
         init();
     }
 
-    final Map<String, FluxReceiver> receiverMaps = new WeakHashMap<>();
+    final Map<String, WeakReference<FluxReceiver>> receiverMaps = new ConcurrentHashMap<>();
 
     public void register(String receiverId,FluxReceiver receiver) {
-        receiverMaps.put(receiverId, receiver);
+        receiverMaps.put(receiverId, new WeakReference<FluxReceiver>(receiver));
     }
 
     public void unregister(String receiverId, FluxReceiver receiver) {
@@ -47,14 +49,20 @@ public enum FluxCore {
             return;
         }
 
-        Object target = receiverMaps.get(receiverId);
-        if (target == null) {
+        WeakReference<FluxReceiver> receiverHolder = receiverMaps.get(receiverId);
+        if (receiverHolder == null || receiverHolder.get() == null) {
+            receiverMaps.remove(receiverId);
+            return;
+        }
+        FluxReceiver targetByID = receiverHolder.get();
+
+        if (targetByID == null) {
             receiverMaps.remove(receiverId);
             return;
         }
 
         // UUID target all match
-        if (target == receiver) {
+        if (targetByID == receiver) {
             receiverMaps.remove(receiverId);
         } else {
             // UUID has a new receiver
@@ -105,16 +113,17 @@ public enum FluxCore {
             return;
         }
 
-        Object targetById = receiverMaps.get(receiverId);
-        if (targetById == null) {
+        WeakReference<FluxReceiver> receiverHolder = receiverMaps.get(receiverId);
+        if (receiverHolder == null || receiverHolder.get() == null) {
             receiverMaps.remove(receiverId);
             return;
         }
 
-        if (targetById instanceof TargetHolder) {
-            Object realTarget = ((TargetHolder) targetById).getTarget(); // maybe activity
+        FluxReceiver targetByID = receiverHolder.get();
+        if (targetByID instanceof TargetHolder) {
+            Object realTarget = ((TargetHolder) targetByID).getTarget(); // maybe activity
             if (realTarget == target) {
-                // targetById is the fluxrespose proxy of target, should be removed
+                // targetByID is the fluxrespose proxy of target, should be removed
                 receiverMaps.remove(receiverId);
             }
         }
@@ -123,12 +132,14 @@ public enum FluxCore {
 
     @Subscribe
     public void onReceiveResponse(FluxResponse fluxResponse) {
-        if (!receiverMaps.containsKey(fluxResponse.getReceiverId())) {
+        String receiverId = fluxResponse.getReceiverId();
+        if (!receiverMaps.containsKey(receiverId)) {
             return;
         }
-
-        FluxReceiver receiver = receiverMaps.get(fluxResponse.getReceiverId());
+        WeakReference<FluxReceiver> receiverHolder = receiverMaps.get(receiverId);
+        FluxReceiver receiver = receiverHolder.get();
         if (receiver == null) {
+            receiverMaps.remove(receiverId);
             return;
         }
 

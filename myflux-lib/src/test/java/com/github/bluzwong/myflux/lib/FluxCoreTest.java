@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +36,7 @@ public class FluxCoreTest {
 
     @Test
     public void testRegister() throws Exception {
-        Map<String, FluxReceiver> maps = FluxCore.INSTANCE.receiverMaps;
+        Map<String, WeakReference<FluxReceiver>> maps = FluxCore.INSTANCE.receiverMaps;
         maps.clear();
 
         FluxReceiver receiver = new FluxReceiver() {
@@ -46,12 +47,12 @@ public class FluxCoreTest {
         };
         FluxCore.INSTANCE.register("ccf", receiver);
         assertTrue(maps.containsKey("ccf"));
-        assertEquals(maps.get("ccf"), receiver);
+        assertEquals(maps.get("ccf").get(), receiver);
     }
 
     @Test
     public void testUnregister() throws Exception {
-        Map<String, FluxReceiver> maps = FluxCore.INSTANCE.receiverMaps;
+        Map<String, WeakReference<FluxReceiver>> maps = FluxCore.INSTANCE.receiverMaps;
         maps.clear();
 
         FluxReceiver receiver = new FluxReceiver() {
@@ -62,10 +63,10 @@ public class FluxCoreTest {
         };
         FluxCore.INSTANCE.register("ccf", receiver);
         assertTrue(maps.containsKey("ccf"));
-        assertEquals(maps.get("ccf"), receiver);
+        assertEquals(maps.get("ccf").get(), receiver);
 
         FluxCore.INSTANCE.unregister("wsd", receiver);
-        assertEquals(maps.get("ccf"), receiver);
+        assertEquals(maps.get("ccf").get(), receiver);
 
         FluxCore.INSTANCE.unregister("ccf", new FluxReceiver() {
             @Override
@@ -73,7 +74,7 @@ public class FluxCoreTest {
 
             }
         });
-        assertEquals(maps.get("ccf"), receiver);
+        assertEquals(maps.get("ccf").get(), receiver);
         FluxCore.INSTANCE.unregister("ccf", receiver);
         assertEquals(maps.get("ccf"), null);
     }
@@ -90,11 +91,11 @@ public class FluxCoreTest {
 
     @Test
     public void testRegister2() throws Exception {
-        Map<String, FluxReceiver> maps = FluxCore.INSTANCE.receiverMaps;
+        Map<String, WeakReference<FluxReceiver>> maps = FluxCore.INSTANCE.receiverMaps;
         maps.clear();
         TestObject object = new TestObject();
         FluxCore.INSTANCE.register("ccf", object);
-        FluxReceiver receiverProxy = maps.get("ccf");
+        FluxReceiver receiverProxy = maps.get("ccf").get();
         assertNotNull(receiverProxy);
         assertNotEquals(object, receiverProxy);
         latch = new CountDownLatch(1);
@@ -104,11 +105,11 @@ public class FluxCoreTest {
 
     @Test
     public void testUnregister2() throws Exception {
-        Map<String, FluxReceiver> maps = FluxCore.INSTANCE.receiverMaps;
+        Map<String, WeakReference<FluxReceiver>> maps = FluxCore.INSTANCE.receiverMaps;
         maps.clear();
         TestObject object = new TestObject();
         FluxCore.INSTANCE.register("ccf", object);
-        FluxReceiver receiverProxy = maps.get("ccf");
+        FluxReceiver receiverProxy = maps.get("ccf").get();
         assertNotNull(receiverProxy);
         assertNotEquals(object, receiverProxy);
 
