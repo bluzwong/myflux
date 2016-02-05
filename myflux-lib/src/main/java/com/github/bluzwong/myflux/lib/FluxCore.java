@@ -1,20 +1,13 @@
 package com.github.bluzwong.myflux.lib;
 
-import com.github.bluzwong.myflux.lib.switchtype.DispatcherFactory;
-import com.github.bluzwong.myflux.lib.switchtype.ReceiveType;
-import com.github.bluzwong.myflux.lib.switchtype.ReceiveTypeDispatcher;
-import com.github.bluzwong.myflux.lib.switchtype.TargetHolder;
+import com.github.bluzwong.myflux.lib.switchtype.*;
 import com.hwangjr.rxbus.RxBus;
 import com.hwangjr.rxbus.annotation.Subscribe;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -30,85 +23,82 @@ public enum FluxCore {
     public void destroy() {
         RxBus.get().unregister(this);
     }
+
     // init
     {
         init();
     }
 
-    final Map<String, WeakReference<FluxReceiver>> receiverMaps = new ConcurrentHashMap<String, WeakReference<FluxReceiver>>();
+    final Map<String, ReceiverHolder> receiverMaps = new ConcurrentHashMap<String, ReceiverHolder>();
 
-    public void register(String receiverId,FluxReceiver receiver) {
-        receiverMaps.put(receiverId, new WeakReference<FluxReceiver>(receiver));
+    // register with a receiver implements interface
+    public void register(String receiverId, FluxReceiver receiver) {
+        if (receiver == null || receiverId == null) {
+            // todo null check
+            return;
+        }
+        receiverMaps.put(receiverId, ReceiverHolder.createNormal(receiver));
     }
 
-    public void unregister(String receiverId, FluxReceiver receiver) {
-        if (receiver == null) {
+
+    // register with a Object
+    /**
+     * should receive response at the receiver class by this:
+     * // annotation args    type: distinguish request type
+     * // method args     FluxResponse response: must be the only arg, response of request
+     * <p/>
+     * \@ReceiveType(type = {"Custom Request Type"})
+     * public void doCcf(FluxResponse response) { }
+     *
+     * @param receiverId unique receiver id
+     * @param receiver   which receive response with receiverId
+     */
+    public void register(String receiverId, final Object receiver) {
+        if (receiver == null || receiverId == null) {
+            // todo null check
+            return;
+        }
+
+        FluxReceiver instance = (FluxReceiver) Proxy.newProxyInstance(FluxReceiver.class.getClassLoader(), new Class[]{FluxReceiver.class},
+                new FluxInvocationHandler(receiver));
+        receiverMaps.put(receiverId, ReceiverHolder.createProxy(instance, receiver));
+    }
+
+    // unregister a object or receiver interface
+    public void unregister(String receiverId, Object receiver) {
+        if (receiver == null || receiverId == null) {
             return;
         }
         if (!receiverMaps.containsKey(receiverId)) {
             return;
         }
 
-        WeakReference<FluxReceiver> receiverHolder = receiverMaps.get(receiverId);
-        if (receiverHolder == null || receiverHolder.get() == null) {
+        ReceiverHolder receiverHolder = receiverMaps.get(receiverId);
+        if (receiverHolder == null || receiverHolder.getReceiver() == null) {
             receiverMaps.remove(receiverId);
             return;
         }
-        FluxReceiver targetByID = receiverHolder.get();
+        Object registeredReceiver = receiverHolder.getRegisteredReceiver();
 
         // UUID target all match
-        if (targetByID == receiver) {
+        if (registeredReceiver == receiver) {
             receiverMaps.remove(receiverId);
         } else {
             // UUID has a new receiver
         }
     }
 
-    static class FluxInvocationHandler implements InvocationHandler {
 
-        private Object target;
 
-        public FluxInvocationHandler(Object target) {
-            this.target = target;
-        }
-
-        @Override
-        public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
-            String methodName = method.getName();
-            if (methodName.equals("onReceive") && objects.length == 1) {
-                switchReceiveType(target, ((FluxResponse) objects[0]));
-            } else if (methodName.equals("getTarget")) {
-                return target;
-            }
-            return null;
-        }
-    }
-
-    /**
-     * should receive response at the receiver class by this:
-     * // annotation args    type: distinguish request type
-     * // method args     FluxResponse response: must be the only arg, response of request
-     *
-     *  \@ReceiveType(type = {"Custom Request Type"})
-        public void doCcf(FluxResponse response) { }
-
-     * @param receiverId unique receiver id
-     * @param target receiver which receive response with receiverId
-     */
-    public void register(String receiverId, final Object target) {
-        FluxReceiver instance = (FluxReceiver) Proxy.newProxyInstance(FluxReceiver.class.getClassLoader(), new Class[]{FluxReceiver.class, TargetHolder.class}, new FluxInvocationHandler(target));
-        register(receiverId, instance);
-    }
-
-    public void unregister(String receiverId, Object target) {
-        if (target == null) {
+    /*public void unregister(String receiverId, Object target) {
+        if (target == null || receiverId == null) {
             return;
         }
         if (!receiverMaps.containsKey(receiverId)) {
             return;
         }
 
-        WeakReference<FluxReceiver> receiverHolder = receiverMaps.get(receiverId);
+        ReceiverHolder receiverHolder = receiverMaps.get(receiverId);
         if (receiverHolder == null || receiverHolder.get() == null) {
             receiverMaps.remove(receiverId);
             return;
@@ -122,7 +112,7 @@ public enum FluxCore {
                 receiverMaps.remove(receiverId);
             }
         }
-    }
+    }*/
 
 
     @Subscribe
@@ -131,14 +121,17 @@ public enum FluxCore {
         if (!receiverMaps.containsKey(receiverId)) {
             return;
         }
-        WeakReference<FluxReceiver> receiverHolder = receiverMaps.get(receiverId);
+        ReceiverHolder receiverHolder = receiverMaps.get(receiverId);
 
-        if (receiverHolder == null || receiverHolder.get() == null) {
+        if (receiverHolder == null || receiverHolder.getReceiver() == null) {
             receiverMaps.remove(receiverId);
             return;
         }
 
-        FluxReceiver receiver = receiverHolder.get();
+        FluxReceiver receiver = receiverHolder.getReceiver();
+        if (receiver == null) {
+            return;
+        }
         receiver.onReceive(fluxResponse);
     }
 
