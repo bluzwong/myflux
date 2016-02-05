@@ -35,7 +35,7 @@ public enum FluxCore {
         init();
     }
 
-    final Map<String, WeakReference<FluxReceiver>> receiverMaps = new ConcurrentHashMap<>();
+    final Map<String, WeakReference<FluxReceiver>> receiverMaps = new ConcurrentHashMap<String, WeakReference<FluxReceiver>>();
 
     public void register(String receiverId,FluxReceiver receiver) {
         receiverMaps.put(receiverId, new WeakReference<FluxReceiver>(receiver));
@@ -55,11 +55,6 @@ public enum FluxCore {
             return;
         }
         FluxReceiver targetByID = receiverHolder.get();
-
-        if (targetByID == null) {
-            receiverMaps.remove(receiverId);
-            return;
-        }
 
         // UUID target all match
         if (targetByID == receiver) {
