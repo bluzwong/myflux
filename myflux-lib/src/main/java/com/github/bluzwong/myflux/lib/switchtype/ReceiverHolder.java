@@ -19,7 +19,7 @@ public class ReceiverHolder {
 
     public static ReceiverHolder createNormal(FluxReceiver realReceiver) {
         ReceiverHolder holder = new ReceiverHolder();
-        holder.interfaceReceiver = new WeakReference<>(realReceiver);
+        holder.interfaceReceiver = new WeakReference<FluxReceiver>(realReceiver);
         return holder;
     }
 
