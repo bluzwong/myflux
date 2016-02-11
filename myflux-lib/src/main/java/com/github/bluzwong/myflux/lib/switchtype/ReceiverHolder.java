@@ -35,6 +35,10 @@ public class ReceiverHolder {
             return interfaceReceiver.get();
         }
 
+        if (objectReceiver == null || objectReceiver.get() == null) {
+            return null;
+        }
+
         if (proxyReceiver != null) {
             return proxyReceiver;
         }

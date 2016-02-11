@@ -123,7 +123,7 @@ public class AnnotationProcessor extends AbstractProcessor{
                 // fieldType -> (java.util.Map<java.lang.String,java.lang.Object>,java.lang.String)void
 //                log("simplename" + e.getSimpleName());
 
-                final MethodInjector methodInjector = new MethodInjector(methodName.toString()/*, e.asType().toString().equals("(com.github.bluzwong.myflux.lib.FluxResponse,java.util.Map<java.lang.String,java.lang.Object>)void")*/);
+                final MethodInjector methodInjector = new MethodInjector(methodName.toString(), e.asType().toString().equals("(com.github.bluzwong.myflux.lib.FluxResponse)void"));
                 final ClassInjector injector = getOrCreateTargetClass(targetClassMap, className);
                 for (AnnotationMirror mirror : annotationMirrors) {
                     DeclaredType annotationType = mirror.getAnnotationType();

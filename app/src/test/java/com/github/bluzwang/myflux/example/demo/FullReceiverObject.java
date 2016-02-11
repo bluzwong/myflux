@@ -59,4 +59,13 @@ public class FullReceiverObject {
         receives[3] = sum;
     }
 
+    @ReceiveType(type = "ccf")
+    void testNoArg() {
+
+    }
+
+    @ReceiveType(type = "ccf")
+    void testNoArg(FluxResponse response) {
+
+    }
 }

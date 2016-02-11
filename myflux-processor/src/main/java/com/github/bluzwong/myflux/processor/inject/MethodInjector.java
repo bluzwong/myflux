@@ -8,11 +8,12 @@ import java.util.List;
  */
 public class MethodInjector {
     String methodName = "";
-    boolean isTwoArguments = false;
+    boolean needResponse = false;
     List<String> types = new ArrayList<String>();
 
-    public MethodInjector(String methodName) {
+    public MethodInjector(String methodName, boolean needResponse) {
         this.methodName = methodName;
+        this.needResponse = needResponse;
     }
 
     public void addType(String type) {
@@ -27,6 +28,9 @@ public class MethodInjector {
             return "";
 
         }
-        return "receiver." + methodName + "(fluxResponse);\n";
+        if (needResponse) {
+            return "receiver." + methodName + "(fluxResponse);\n";
+        }
+        return "receiver." + methodName + "();\n";
     }
 }
