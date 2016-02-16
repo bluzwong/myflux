@@ -16,10 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public enum FluxCore {
     INSTANCE;
 
-    public static FluxCore getInstance() {
-        return INSTANCE;
-    }
-
     public void init() {
         RxBus.get().register(this);
     }
