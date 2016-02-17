@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = 'com.github.bluzwong'
 
 android {
     compileSdkVersion 22
@@ -41,4 +44,4 @@ repositories {jcenter {
 }
     mavenCentral()
 }
-apply from: 'push.gradle'
+//apply from: 'push.gradle'
