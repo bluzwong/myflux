@@ -129,12 +129,12 @@ public class AnnotationProcessor extends AbstractProcessor{
                     log("annotationType => " + annotationType); //annotationType => com.github.bluzwong.myflux.lib.switchtype.ReceiveType
                     Map<? extends ExecutableElement, ? extends AnnotationValue> values = mirror.getElementValues();
                     for (ExecutableElement execElement:values.keySet()) {
-                        if (!executableElement.toString().equals("type()")) {
-                            continue;
-                        }
                         AnnotationValue annotationValue = values.get(execElement);
                         log("execElement: " + execElement + " => annotationValue : " + annotationValue);
                         log("annotationValue cls => " + annotationValue.getValue());
+                        if (!execElement.toString().equals("type()")) {
+                            continue;
+                        }
                         // execElement: type() => annotationValue : {"ccf"}
                         // execElement: type() => annotationValue : {"wsd", "ccf"}
                         String valueString = annotationValue.getValue().toString();
