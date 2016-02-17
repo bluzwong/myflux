@@ -1,12 +1,8 @@
-
-plugins {
-    id "java"
-    id "maven-publish"
-    id "com.jfrog.bintray" version "1.2"
-}
 apply plugin: 'java'
-version="1.1.3"  // The version
+apply plugin: 'maven'
+
 group = 'com.github.bluzwong'
+
 task sourceJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
@@ -16,41 +12,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {  // Artifacts to publish
-            from components.java
-            artifact sourceJar
-            artifact javadocJar
-        }
-    }
-}
-
-bintray {
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    user = properties.getProperty('bintray.user')
-    key = properties.getProperty('bintray.apikey')
-
-    dryRun = false
-    publish = true
-    publications = ['mavenJava']
-    pkg {
-        repo = 'maven'         // The repository
-        name = 'myflux-processor' // The package
-        desc = 'myflux-processor'
-        websiteUrl = 'https://github.com/bluzwong/myflux'
-        issueTrackerUrl = 'https://github.com/bluzwong/myflux'
-        vcsUrl = 'https://github.com/bluzwong/myflux'
-        licenses = ['Apache-2.0']
-        labels = [['flux', 'android', 'library']]
-        publicDownloadNumbers = true
-    }
-}
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

@@ -17,7 +17,6 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.Writer;
 import java.util.*;
-import java.util.function.BiConsumer;
 
 /**
  * Created by wangzhijie@wind-mobi.com on 2015/9/24.
@@ -129,21 +128,22 @@ public class AnnotationProcessor extends AbstractProcessor{
                     DeclaredType annotationType = mirror.getAnnotationType();
                     log("annotationType => " + annotationType); //annotationType => com.github.bluzwong.myflux.lib.switchtype.ReceiveType
                     Map<? extends ExecutableElement, ? extends AnnotationValue> values = mirror.getElementValues();
-                    values.forEach(new BiConsumer<ExecutableElement, AnnotationValue>() {
-                        @Override
-                        public void accept(ExecutableElement executableElement, AnnotationValue annotationValue) {
-                            log("executableElement: " + executableElement + " => annotationValue : " + annotationValue);
-                            log("annotationValue cls => " + annotationValue.getValue());
-                            // executableElement: type() => annotationValue : {"ccf"}
-                            // executableElement: type() => annotationValue : {"wsd", "ccf"}
-                            String valueString = annotationValue.getValue().toString();
-                            String[] typeValues = valueString.split(",");
-                            for (String typeValue : typeValues) {
-                                methodInjector.addType(typeValue);
-                                injector.addType(typeValue);
-                            }
+                    for (ExecutableElement execElement:values.keySet()) {
+                        if (!executableElement.toString().equals("type()")) {
+                            continue;
                         }
-                    });
+                        AnnotationValue annotationValue = values.get(execElement);
+                        log("execElement: " + execElement + " => annotationValue : " + annotationValue);
+                        log("annotationValue cls => " + annotationValue.getValue());
+                        // execElement: type() => annotationValue : {"ccf"}
+                        // execElement: type() => annotationValue : {"wsd", "ccf"}
+                        String valueString = annotationValue.getValue().toString();
+                        String[] typeValues = valueString.split(",");
+                        for (String typeValue : typeValues) {
+                            methodInjector.addType(typeValue);
+                            injector.addType(typeValue);
+                        }
+                    }
                 }
 
                 injector.addMethod(methodInjector);
