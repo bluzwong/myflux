@@ -43,8 +43,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:design:22.2.1'
 
-    compile ('com.github.bluzwong.myflux:myflux-lib:1.2.1@aar') { transitive = true }
-    kapt 'com.github.bluzwong.myflux:myflux-processor:1.2.1'
+    compile ('com.github.bluzwong.myflux:myflux-lib:1.2.2@aar') { transitive = true }
+    kapt 'com.github.bluzwong.myflux:myflux-processor:1.2.2'
 //    compile project(':myflux-lib')
 //    kapt project(':myflux-processor')
 
