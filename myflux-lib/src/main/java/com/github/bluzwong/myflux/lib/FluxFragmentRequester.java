@@ -134,12 +134,15 @@ public class FluxFragmentRequester extends Fragment {
         }
 
         Subscription subscription = requestingMap.get(uuid);
-        if (subscription == null || subscription.isUnsubscribed()) {
-            // request is finished or is null
+        if (subscription == null) {
+            // request is null
             return;
         }
-
-        subscription.unsubscribe();
+        if (!subscription.isUnsubscribed()) {
+            // can unsubscribe
+            subscription.unsubscribe();
+            //return;
+        }
         if (requestingMap.containsKey(uuid)) {
             requestingMap.remove(uuid);
         }
@@ -161,12 +164,12 @@ public class FluxFragmentRequester extends Fragment {
 
     /**
      * do request at scheduler
-     *
+     * sync can not cancel
      * @param scheduler work on which thread
      * @param action    the real request
      * @return the unique id of each request
      */
-    protected String doRequest(Scheduler scheduler, final RequestAction action) {
+    private String doRequest(Scheduler scheduler, final RequestAction action) {
         final String uuid = createUUID();
         Subscription subscription = Observable.just(action)
                 .observeOn(scheduler)
@@ -178,21 +181,8 @@ public class FluxFragmentRequester extends Fragment {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object nil) {
-                        if (requestingMap.containsKey(uuid)) {
-                            requestingMap.remove(uuid);
-                        }
-                    }
-                });
+                .subscribe();
         requestingMap.put(uuid, subscription);
-        return uuid;
-    }
-
-    protected String doRequest(final RequestAction action) {
-        final String uuid = createUUID();
-        action.request(uuid);
         return uuid;
     }
 
@@ -208,11 +198,4 @@ public class FluxFragmentRequester extends Fragment {
         return doRequest(Schedulers.newThread(), action);
     }
 
-    protected String doRequestMainThread(final RequestAction action) {
-        return doRequest(AndroidSchedulers.mainThread(), action);
-    }
-
-    protected String doRequestCurrent(final RequestAction action) {
-        return doRequest(Schedulers.immediate(), action);
-    }
 }

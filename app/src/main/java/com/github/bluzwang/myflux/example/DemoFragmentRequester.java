@@ -33,51 +33,6 @@ public class DemoFragmentRequester extends FluxFragmentRequester {
     }
 
     /**
-     * request work on the current thread, may block main thread if the current is;
-     */
-    public String requestSum(final int a, final int b) {
-        return doRequest(new RequestAction() {
-            @Override
-            public void request(final String requestUUID) {
-                /// will block main thread
-                int sum = slowAdd(a, b);
-                createResponse("1", requestUUID).setData("sum", sum).post();
-            }
-        });
-    }
-
-
-    /**
-     * request work on the current thread, use rxjava to do request
-     */
-    public String requestSum2(final int a, final int b) {
-        return doRequest(new RequestAction() {
-            @Override
-            public void request(final String requestUUID) {
-                Observable.just(requestUUID)
-                        .observeOn(Schedulers.io())
-                        .map(new Func1<String, Integer>() {
-                            @Override
-                            public Integer call(String s) {
-                                try {
-                                    Thread.sleep(200);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                return a+b;
-                            }
-                        })
-                        .subscribe(new Action1<Integer>() {
-                    @Override
-                    public void call(Integer integer) {
-                        createResponse("1", requestUUID).setData("sum", integer).post();
-                    }
-                });
-            }
-        });
-    }
-
-    /**
      * io request work on IO thread, not block main thread
      * 将会在io线程运行
 
