@@ -21,7 +21,7 @@ public class FluxRequesterTest {
 
     @Before
     public void setUp() throws Exception {
-        requester = new FluxRequester("id");
+        //requester = new FluxRequester("id");
     }
 
     @Test
