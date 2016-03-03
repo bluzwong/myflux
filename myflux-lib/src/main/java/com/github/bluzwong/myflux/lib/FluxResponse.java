@@ -16,7 +16,7 @@ public final class FluxResponse {
     private String type;
     private String requestUUID;
     private String receiverId;
-
+    public static final String FLUX_KEY_ONLY = "$FLUX_KEY_ONLY$";
     private FluxResponse(String receiverId, String type, String requestUUID) {
         this.type = type;
         this.receiverId = receiverId;
@@ -32,6 +32,25 @@ public final class FluxResponse {
         dataMap.put(key, data);
         return this;
     }
+
+    public FluxResponse put(String key, Object data) {
+        dataMap.put(key, data);
+        return this;
+    }
+
+    public <T> T get(String key) {
+        return (T) dataMap.get(key);
+    }
+
+    public FluxResponse putOnly(Object data) {
+        dataMap.put(FLUX_KEY_ONLY, data);
+        return this;
+    }
+
+    public <T> T getOnly() {
+        return (T) dataMap.get(FLUX_KEY_ONLY);
+    }
+
 
     public void post() {
         Observable.just(this)
