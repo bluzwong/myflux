@@ -40,6 +40,13 @@ public class DemoFragmentActivity extends Activity  {
                 requester.requestSumIO(1, 2);
             }
         });
+
+        findViewById(R.id.btn2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requester.cancelAll();
+            }
+        });
     }
 
     // 接收 type = "1" 的响应时运行

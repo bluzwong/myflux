@@ -16,6 +16,7 @@ public final class FluxResponse {
     private String type;
     private String requestUUID;
     private String receiverId;
+    private boolean isCanceled = false;
     public static final String FLUX_KEY_ONLY = "$FLUX_KEY_ONLY$";
     private FluxResponse(String receiverId, String type, String requestUUID) {
         this.type = type;
@@ -53,6 +54,10 @@ public final class FluxResponse {
 
 
     public void post() {
+        if (isCanceled) {
+            // this response is canceled
+            return;
+        }
         Observable.just(this)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<FluxResponse>() {
@@ -91,4 +96,13 @@ public final class FluxResponse {
         return receiverId;
     }
 
+    public FluxResponse cancel() {
+        isCanceled = true;
+        return this;
+    }
+
+    public FluxResponse cancel(boolean cancel) {
+        isCanceled = cancel;
+        return this;
+    }
 }

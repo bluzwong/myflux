@@ -5,11 +5,15 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import rx.Observable;
 import rx.Scheduler;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 /**
  * Created by bluzwong on 2016/2/3.
@@ -19,6 +23,7 @@ public class FluxFragmentRequester extends Fragment {
 
     public static final String FLUX_RECEIVER_KEY = "FLUX_RECEIVER_KEY";
 
+    private final Map<String, Subscription> requestingMap = new WeakHashMap<String, Subscription>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,23 +104,55 @@ public class FluxFragmentRequester extends Fragment {
      * @return response instance, need invoke post() to post it
      */
     protected FluxResponse createResponse(String type, String requestUUID) {
-        return FluxResponse.create(receiverId, type, requestUUID);
+        return FluxResponse.create(receiverId, type, requestUUID)
+                .cancel(!requestingMap.containsKey(requestUUID));
     }
 
     protected FluxResponse newFluxResponse(String type, String requestUUID) {
-        return FluxResponse.create(receiverId, type, requestUUID);
+        return FluxResponse.create(receiverId, type, requestUUID)
+                .cancel(!requestingMap.containsKey(requestUUID));
     }
 
     protected FluxResponse buildFluxResponse(String type, String requestUUID) {
-        return FluxResponse.create(receiverId, type, requestUUID);
+        return FluxResponse.create(receiverId, type, requestUUID)
+                .cancel(!requestingMap.containsKey(requestUUID));
     }
 
     protected FluxResponse makeFluxResponse(String type, String requestUUID) {
-        return FluxResponse.create(receiverId, type, requestUUID);
+        return FluxResponse.create(receiverId, type, requestUUID)
+                .cancel(!requestingMap.containsKey(requestUUID));
     }
 
     protected static String createUUID() {
         return UUID.randomUUID().toString();
+    }
+
+    public void cancel(String uuid) {
+        if (!requestingMap.containsKey(uuid)) {
+            // uuid not matched
+            return;
+        }
+
+        Subscription subscription = requestingMap.get(uuid);
+        if (subscription == null || subscription.isUnsubscribed()) {
+            // request is finished or is null
+            return;
+        }
+
+        subscription.unsubscribe();
+        if (requestingMap.containsKey(uuid)) {
+            requestingMap.remove(uuid);
+        }
+    }
+
+    public void cancelAll() {
+        for (Map.Entry<String, Subscription> kv : requestingMap.entrySet()) {
+            if (kv.getValue().isUnsubscribed()) {
+                continue;
+            }
+            kv.getValue().unsubscribe();
+        }
+        requestingMap.clear();
     }
 
     protected interface RequestAction {
@@ -131,14 +168,25 @@ public class FluxFragmentRequester extends Fragment {
      */
     protected String doRequest(Scheduler scheduler, final RequestAction action) {
         final String uuid = createUUID();
-        Observable.just(action)
+        Subscription subscription = Observable.just(action)
                 .observeOn(scheduler)
-                .doOnNext(new Action1<RequestAction>() {
+                .map(new Func1<RequestAction, Object>() {
                     @Override
-                    public void call(RequestAction requestAction) {
+                    public Object call(RequestAction requestAction) {
                         action.request(uuid);
+                        return null;
                     }
-                }).subscribe();
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object nil) {
+                        if (requestingMap.containsKey(uuid)) {
+                            requestingMap.remove(uuid);
+                        }
+                    }
+                });
+        requestingMap.put(uuid, subscription);
         return uuid;
     }
 
