@@ -11,6 +11,7 @@ import java.util.UUID;
 /**
  * Created by bluzwong on 2016/2/3.
  */
+@Deprecated
 public class FluxRequester {
 
     protected String receiverId;

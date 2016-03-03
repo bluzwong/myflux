@@ -16,7 +16,8 @@ public final class FluxResponse {
     private String type;
     private String requestUUID;
     private String receiverId;
-
+    private boolean isCanceled = false;
+    public static final String FLUX_KEY_ONLY = "$FLUX_KEY_ONLY$";
     private FluxResponse(String receiverId, String type, String requestUUID) {
         this.type = type;
         this.receiverId = receiverId;
@@ -33,7 +34,30 @@ public final class FluxResponse {
         return this;
     }
 
+    public FluxResponse put(String key, Object data) {
+        dataMap.put(key, data);
+        return this;
+    }
+
+    public <T> T get(String key) {
+        return (T) dataMap.get(key);
+    }
+
+    public FluxResponse putOnly(Object data) {
+        dataMap.put(FLUX_KEY_ONLY, data);
+        return this;
+    }
+
+    public <T> T getOnly() {
+        return (T) dataMap.get(FLUX_KEY_ONLY);
+    }
+
+
     public void post() {
+        if (isCanceled) {
+            // this response is canceled
+            return;
+        }
         Observable.just(this)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<FluxResponse>() {
@@ -72,4 +96,13 @@ public final class FluxResponse {
         return receiverId;
     }
 
+    public FluxResponse cancel() {
+        isCanceled = true;
+        return this;
+    }
+
+    public FluxResponse cancel(boolean cancel) {
+        isCanceled = cancel;
+        return this;
+    }
 }

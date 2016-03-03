@@ -59,6 +59,11 @@ public enum FluxCore {
             return;
         }
 
+        /*if (receiverMaps.containsKey(receiverId)) {
+            // exists ignore register
+            return;
+        }*/
+
         FluxReceiver instance = (FluxReceiver) Proxy.newProxyInstance(FluxReceiver.class.getClassLoader(), new Class[]{FluxReceiver.class},
                 new FluxInvocationHandler(receiver));
         receiverMaps.put(receiverId, ReceiverHolder.createProxy(instance, receiver));
