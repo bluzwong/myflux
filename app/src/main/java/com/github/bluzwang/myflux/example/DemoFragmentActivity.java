@@ -3,6 +3,7 @@ package com.github.bluzwang.myflux.example;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.github.bluzwang.myflux_kotlin.R;
 import com.github.bluzwong.myflux.lib.FluxCore;
@@ -16,6 +17,7 @@ public class DemoFragmentActivity extends Activity  {
 
     DemoFragmentRequester requester;
 
+    TextView tv1,tv2,tv3,tv4;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +26,11 @@ public class DemoFragmentActivity extends Activity  {
 
         // 获取与 this 绑定的请求器
         requester = Flux.getRequester(this, DemoFragmentRequester.class);
+
+        tv1 = (TextView) findViewById(R.id.tv1);
+        tv2 = (TextView) findViewById(R.id.tv2);
+        tv3 = (TextView) findViewById(R.id.tv3);
+        tv4 = (TextView) findViewById(R.id.tv4);
 
         // 点击发出请求
         // 该请求将会发出一个type = "2" 的响应
@@ -35,32 +42,32 @@ public class DemoFragmentActivity extends Activity  {
         });
     }
 
-    // 注册后 将会在接收到 type = "1" 的响应时运行在主线程
+    // 接收 type = "1" 的响应时运行
     @ReceiveType(type = {"1"})
     void doCcf(FluxResponse response) {
         int sum = (int) response.getData("sum");
-        Toast.makeText(this, "type = {\"1\"} sum => " + sum, Toast.LENGTH_SHORT).show();
+        tv1.setText("type = {\"1\"} => " + sum);
     }
 
-    // 注册后 将会在接收到 type = "2" 的响应时运行在主线程
+    // 接收 type = "2" 的响应时运行
     @ReceiveType(type = "2")
     void doCcf2(FluxResponse response) {
         int sum = (int) response.getData("sum");
-        Toast.makeText(this, "type = \"2\" sum => " + sum, Toast.LENGTH_SHORT).show();
+        tv2.setText("type = \"2\" => " + sum);
     }
 
-    // 注册后 将会在接收到 type = "2" 或者type = "2" 的响应时运行在主线程
+    // 接收 type = "2" 或者type = "2" 的响应时运行
     @ReceiveType(type = {"1", "2"})
     void dowsd2(FluxResponse response) {
         int sum = (int) response.getData("sum");
-        Toast.makeText(this, "type = {\"1\", \"2\"} sum => " + sum, Toast.LENGTH_SHORT).show();
+        tv3.setText("type = {\"1\", \"2\"} => " + sum);
     }
 
-    // 注册后 将会在接收到 type = RequestType.REQUEST_1 或者type = RequestType.REQUEST_2 的响应时运行在主线程
+    // 接收 type = RequestType.REQUEST_1 或者type = RequestType.REQUEST_2 的响应时运行
     @ReceiveType(type = {RequestType.REQUEST_1, RequestType.REQUEST_2})
     void dowsd(FluxResponse response) {
         int sum = (int) response.getData("sum");
-        Toast.makeText(this, "type = {RequestType.REQUEST_1, RequestType.REQUEST_2} sum => " + sum, Toast.LENGTH_SHORT).show();
+        tv4.setText("type = {RequestType.REQUEST_1, RequestType.REQUEST_2} => " + sum);
     }
 
 }
