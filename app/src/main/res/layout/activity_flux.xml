@@ -14,9 +14,15 @@
             android:id="@+id/btn"
             android:text="1 + 2 = ?"
     />
+    <TextView
+            android:id="@+id/tv"
+            android:layout_below="@id/btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
     <Button android:layout_width="match_parent" android:layout_height="wrap_content"
             android:id="@+id/btn2"
-            android:layout_below="@id/btn"
+            android:layout_below="@id/tv"
             android:text="cancel all"
             />
     <TextView
@@ -35,6 +41,7 @@
             android:layout_below="@id/tv1"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
+            android:freezesText="true"
             android:text="none"
             />
     <TextView

@@ -64,6 +64,7 @@ public class FluxFragmentRequester extends Fragment {
                 requester = clz.newInstance();
                 Bundle bundle = new Bundle();
                 bundle.putString(FLUX_RECEIVER_KEY, createUUID());
+                //bundle.putString();
                 requester.setArguments(bundle);
                 requester.init(fragmentManager, tag);
             } catch (java.lang.InstantiationException e) {
@@ -77,7 +78,6 @@ public class FluxFragmentRequester extends Fragment {
     }
 
     private String receiverId;
-
     public String getReceiverId() {
         if (receiverId == null || receiverId.equals("")) {
             receiverId = getArguments().getString(FLUX_RECEIVER_KEY);
