@@ -43,9 +43,14 @@ dependencies {
     kaptTest 'com.github.bluzwong:myflux-processor:1.1.3'
     //    kaptTest project (':myflux-processor')
     testCompile 'junit:junit:4.12'
-    testCompile 'org.robolectric:robolectric:3.0-rc3'
+    testCompile ('org.robolectric:robolectric:3.0-rc3'){ exclude module: 'asm' }
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile 'com.android.support:support-v13:22.2.1'
+
+
+//    compile 'com.github.bluzwong:monkeykingbar:9a116228f9'
+    compile ('com.github.bluzwong.monkeykingbar:monkeykingbar-lib:0.2.6@aar' ) { transitive = true }
+    kapt 'com.github.bluzwong.monkeykingbar:monkeykingbar-processor:0.2.6'
 }
 buildscript {
     ext.kotlin_version = '1.0.0-rc-1036'

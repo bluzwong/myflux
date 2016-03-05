@@ -1,6 +1,5 @@
 package com.github.bluzwang.myflux.example;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,29 +7,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.github.bluzwang.myflux_kotlin.R;
+import com.github.bluzwong.monkeykingbar_lib.KeepState;
 import com.github.bluzwong.myflux.lib.FluxResponse;
 import com.github.bluzwong.myflux.lib.switchtype.ReceiveType;
 import flux.Flux;
+import mkb.MKB;
 
 /**
  * Created by Bruce-Home on 2016/3/4.
  */
-public class DemoFragment extends Fragment {
+public class DemoFragment extends Fragment implements MKB.ILoadStateListener {
 
     private DemoFragmentRequester requester;
-    TextView tv1,tv2,tv3,tv4;
-    String msg1,msg2,msg3,msg4;
+    TextView tv1, tv2, tv3, tv4;
+
+    @KeepState
+    String msg1, msg2, msg3, msg4;
 
     public DemoFragment() {
-        setArguments(new Bundle());
+        MKB.initFragment(this);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requester = Flux.getRequester(this, DemoFragmentRequester.class, savedInstanceState);
-
     }
 
     @Nullable
@@ -58,50 +61,34 @@ public class DemoFragment extends Fragment {
             }
         });
 
-        Bundle arguments = getArguments();
-        if (savedInstanceState != null) {
-           loadStates(savedInstanceState);
-        } else if (arguments != null) {
-            loadStates(arguments);
-        }
+        MKB.loadState(this, savedInstanceState);
         return view;
     }
 
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-    }
-
-
-    void loadStates(Bundle bundle) {
-        msg1 = bundle.getString("msg1", "not saved");
-        msg2 = bundle.getString("msg2", "not saved");
-        msg3 = bundle.getString("msg3", "not saved");
-        msg4 = bundle.getString("msg4", "not saved");
+    void syncUI() {
         tv1.setText(msg1);
         tv2.setText(msg2);
         tv3.setText(msg3);
         tv4.setText(msg4);
     }
-    void saveStates() {
-        saveStates(getArguments());
+
+    @Override
+    public void loadStateOK() {
+        syncUI();
     }
 
-
-    void saveStates(Bundle bundle) {
-        bundle.putString("msg1",msg1);
-        bundle.putString("msg2",msg2);
-        bundle.putString("msg3",msg3);
-        bundle.putString("msg4",msg4);
+    @Override
+    public void stateNotLoad() {
+        Toast.makeText(getActivity(), "not load", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Flux.fluxOnSaveInstanceState(requester, outState);
-        saveStates(outState);
+
+        MKB.saveState(this);
+        MKB.saveState(this, outState);
     }
 
     // 接收 type = "1" 的响应时运行
@@ -109,8 +96,8 @@ public class DemoFragment extends Fragment {
     void doCcf(FluxResponse response) {
         int sum = (int) response.getData("sum");
         msg1 = "type = {\"1\"} => " + sum;
-        saveStates();
         tv1.setText(msg1);
+        MKB.saveState(this);
     }
 
     // 接收 type = "2" 的响应时运行
@@ -118,8 +105,8 @@ public class DemoFragment extends Fragment {
     void doCcf2(FluxResponse response) {
         int sum = (int) response.getData("sum");
         msg2 = "type = \"2\" => " + sum;
-        saveStates();
         tv2.setText(msg2);
+        MKB.saveState(this);
     }
 
     // 接收 type = "2" 或者type = "2" 的响应时运行
@@ -127,8 +114,8 @@ public class DemoFragment extends Fragment {
     void dowsd2(FluxResponse response) {
         int sum = (int) response.getData("sum");
         msg3 = "type = {\"1\", \"2\"} => " + sum;
-        saveStates();
         tv3.setText(msg3);
+        MKB.saveState(this);
     }
 
     // 接收 type = RequestType.REQUEST_1 或者type = RequestType.REQUEST_2 的响应时运行
@@ -136,7 +123,8 @@ public class DemoFragment extends Fragment {
     void dowsd(FluxResponse response) {
         int sum = (int) response.getData("sum");
         msg4 = "type = {RequestType.REQUEST_1, RequestType.REQUEST_2} => " + sum;
-        saveStates();
         tv4.setText(msg4);
+        MKB.saveState(this);
     }
+
 }
