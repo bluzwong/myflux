@@ -61,7 +61,8 @@ public class DemoFragment extends Fragment implements MKB.ILoadStateListener {
             }
         });
 
-        MKB.loadState(this);
+        // MKB.loadState(this); // if is FragmentPagerAdapter
+        MKB.loadState(this, savedInstanceState); // if is FragmentStatePagerAdapter
         return view;
     }
 
@@ -86,8 +87,9 @@ public class DemoFragment extends Fragment implements MKB.ILoadStateListener {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Flux.fluxOnSaveInstanceState(requester, outState);
-        MKB.saveState(this);
-        //MKB.saveState(this, outState);
+
+        // MKB.saveState(this); // if is FragmentPagerAdapter
+        MKB.saveState(this, outState); // if is FragmentStatePagerAdapter
     }
 
     // 接收 type = "1" 的响应时运行

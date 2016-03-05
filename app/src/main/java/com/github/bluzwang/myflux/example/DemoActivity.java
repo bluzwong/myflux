@@ -19,7 +19,7 @@ public class DemoActivity extends Activity  {
         setContentView(R.layout.activity_container);
         viewPager = (ViewPager) findViewById(R.id.vp);
 
-        viewPager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
+        viewPager.setAdapter(new FragmentStatePagerAdapter(getFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
                 return new DemoFragment();
